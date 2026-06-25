@@ -14,6 +14,7 @@ import {
   Mail,
   X,
 } from 'lucide-react'
+import { Mascot } from '@/components/mascot'
 import { MascotGold } from '@/components/mascot-gold'
 import { OtpInput } from '@/components/otp-input'
 import { useYave } from '@/lib/yave-store'
