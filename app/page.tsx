@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Zap, Heart, Sparkles, LifeBuoy } from 'lucide-react'
+import { ArrowRight, CreditCard, Zap, Heart, Sparkles, LifeBuoy } from 'lucide-react'
 import { YaveLogo } from '@/components/yave-logo'
 import { MascotGold } from '@/components/mascot-gold'
 import { RegulatoryFooter } from '@/components/regulatory-footer'
@@ -36,12 +36,13 @@ const reasons = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen pb-28">
-      <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur">
+      <header className="sticky top-0 z-30 bg-card/95 shadow-sm backdrop-blur">
+        <div className="h-[3px] bg-gradient-to-r from-yellow via-navy to-orange" />
         <div className="mx-auto flex max-w-md items-center justify-between px-5 py-3">
           <YaveLogo />
           <Link
             href="/inicio"
-            className="rounded-full border-2 border-navy bg-transparent px-6 py-2 text-sm font-extrabold tracking-wide text-navy transition-all hover:bg-navy hover:text-white active:translate-y-px"
+            className="rounded-full bg-orange px-6 py-2.5 text-sm font-extrabold tracking-wide text-white shadow-md shadow-orange/20 transition-all hover:brightness-110 active:translate-y-px"
           >
             Ingresar
           </Link>
@@ -116,12 +117,23 @@ export default function LandingPage() {
           <Testimonials />
         </section>
 
+        {/* Payment CTA */}
+        <section className="pt-10">
+          <Link
+            href="/pagos"
+            className="flex h-16 w-full items-center justify-center gap-3 rounded-2xl bg-orange font-heading text-xl font-bold text-white shadow-lg shadow-orange/25 transition-all hover:brightness-110 active:translate-y-px"
+          >
+            <CreditCard className="size-6" />
+            Paga tu cuota aqui
+          </Link>
+        </section>
+
         {/* Mascot CTA */}
         <section className="pt-10">
           <div className="relative overflow-hidden rounded-[2rem] bg-yellow p-6">
             <div className="max-w-[62%]">
               <h2 className="font-heading text-3xl font-extrabold leading-tight text-navy">
-                Tu llave a un crédito más humano
+                Tu llave a un credito mas humano
               </h2>
               <Link
                 href="/onboarding"

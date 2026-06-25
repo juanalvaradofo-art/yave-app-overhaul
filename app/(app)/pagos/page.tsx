@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, CreditCard, Search, QrCode, Banknote, Smartphone, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
@@ -18,6 +18,15 @@ const PAYMENT_METHODS = [
 export default function PagosPage() {
   const [step, setStep] = useState<Step>('id')
   const [cedula, setCedula] = useState('')
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('direct') === '1') {
+        setStep('summary')
+      }
+    }
+  }, [])
 
   return (
     <div className="flex flex-col gap-5">

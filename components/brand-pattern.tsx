@@ -1,74 +1,67 @@
 function buildDoodleTile() {
-  const W = 800
-  const H = 800
-  const NAVY = '#0A2540'
+  const W = 700
+  const H = 700
+  const NAVY = '#003893'
 
   const icons = [
     // Coffee cup
-    `<g><path d="M0 0h14v10a7 7 0 01-14 0z" fill="none" stroke="${NAVY}" stroke-width="1.2"/><path d="M14 3h3a3 3 0 010 6h-3" fill="none" stroke="${NAVY}" stroke-width="1.2"/><path d="M2 -3h10" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round"/><path d="M5 -5q2 -3 4 0" fill="none" stroke="${NAVY}" stroke-width="1" stroke-linecap="round"/></g>`,
+    `<g><path d="M0 0h18v13a9 9 0 01-18 0z" fill="none" stroke="${NAVY}" stroke-width="1.4"/><path d="M18 4h4a4 4 0 010 8h-4" fill="none" stroke="${NAVY}" stroke-width="1.4"/><path d="M3 -4h12" stroke="${NAVY}" stroke-width="1.3" stroke-linecap="round"/><path d="M7 -7q3 -4 6 0" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round"/></g>`,
     // Key
-    `<g><circle cx="6" cy="6" r="5" fill="none" stroke="${NAVY}" stroke-width="1.2"/><circle cx="6" cy="6" r="2" fill="none" stroke="${NAVY}" stroke-width="1"/><line x1="11" y1="6" x2="22" y2="6" stroke="${NAVY}" stroke-width="1.2"/><line x1="19" y1="6" x2="19" y2="10" stroke="${NAVY}" stroke-width="1.2"/><line x1="22" y1="6" x2="22" y2="9" stroke="${NAVY}" stroke-width="1.2"/></g>`,
-    // Coin
-    `<g><circle cx="8" cy="8" r="7.5" fill="none" stroke="${NAVY}" stroke-width="1.2"/><circle cx="8" cy="8" r="5.5" fill="none" stroke="${NAVY}" stroke-width="0.8"/><text x="8" y="11" text-anchor="middle" font-size="8" font-weight="bold" fill="${NAVY}" font-family="sans-serif">$</text></g>`,
+    `<g><circle cx="8" cy="8" r="7" fill="none" stroke="${NAVY}" stroke-width="1.4"/><circle cx="8" cy="8" r="3" fill="none" stroke="${NAVY}" stroke-width="1.1"/><line x1="15" y1="8" x2="28" y2="8" stroke="${NAVY}" stroke-width="1.4"/><line x1="24" y1="8" x2="24" y2="13" stroke="${NAVY}" stroke-width="1.3"/><line x1="28" y1="8" x2="28" y2="12" stroke="${NAVY}" stroke-width="1.3"/></g>`,
+    // Coin $
+    `<g><circle cx="10" cy="10" r="9.5" fill="none" stroke="${NAVY}" stroke-width="1.4"/><circle cx="10" cy="10" r="7" fill="none" stroke="${NAVY}" stroke-width="0.9"/><text x="10" y="14" text-anchor="middle" font-size="11" font-weight="bold" fill="${NAVY}" font-family="sans-serif">$</text></g>`,
     // Growth chart
-    `<g><polyline points="0,16 5,10 10,12 16,4 20,6" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,4 20,4 20,10" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round"/></g>`,
-    // Briefcase (work/camello)
-    `<g><rect x="1" y="5" width="16" height="11" rx="2" fill="none" stroke="${NAVY}" stroke-width="1.2"/><path d="M5 5V3a3 3 0 016 0v2" fill="none" stroke="${NAVY}" stroke-width="1.2"/><line x1="1" y1="10" x2="17" y2="10" stroke="${NAVY}" stroke-width="0.8"/></g>`,
-    // Colombian flag mini
-    `<g><rect x="0" y="0" width="18" height="12" rx="1.5" fill="none" stroke="${NAVY}" stroke-width="1"/><line x1="0" y1="6" x2="18" y2="6" stroke="${NAVY}" stroke-width="0.6"/><line x1="0" y1="9" x2="18" y2="9" stroke="${NAVY}" stroke-width="0.6"/></g>`,
-    // Star/sparkle
-    `<g><path d="M8 0L10 6 16 8 10 10 8 16 6 10 0 8 6 6z" fill="none" stroke="${NAVY}" stroke-width="1" stroke-linejoin="round"/></g>`,
+    `<g><polyline points="0,22 7,14 14,16 22,6 28,8" fill="none" stroke="${NAVY}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><polyline points="20,5 28,5 28,13" fill="none" stroke="${NAVY}" stroke-width="1.3" stroke-linecap="round"/></g>`,
+    // Briefcase
+    `<g><rect x="1" y="7" width="22" height="14" rx="2.5" fill="none" stroke="${NAVY}" stroke-width="1.4"/><path d="M7 7V4.5a3.5 3.5 0 017 0V7" fill="none" stroke="${NAVY}" stroke-width="1.3"/><line x1="1" y1="13" x2="23" y2="13" stroke="${NAVY}" stroke-width="0.9"/></g>`,
+    // Colombian flag
+    `<g><rect x="0" y="0" width="24" height="16" rx="2" fill="none" stroke="${NAVY}" stroke-width="1.2"/><line x1="0" y1="8" x2="24" y2="8" stroke="${NAVY}" stroke-width="0.7"/><line x1="0" y1="12" x2="24" y2="12" stroke="${NAVY}" stroke-width="0.7"/></g>`,
+    // Sparkle/star
+    `<g><path d="M10 0L12.5 7.5 20 10 12.5 12.5 10 20 7.5 12.5 0 10 7.5 7.5z" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linejoin="round"/></g>`,
     // Lightbulb
-    `<g><path d="M8 2a6 6 0 013.5 10.8V15a1.5 1.5 0 01-1.5 1.5h-4A1.5 1.5 0 014.5 15v-2.2A6 6 0 018 2z" fill="none" stroke="${NAVY}" stroke-width="1.2"/><line x1="6" y1="15" x2="10" y2="15" stroke="${NAVY}" stroke-width="0.8"/></g>`,
+    `<g><path d="M10 2a8 8 0 014.5 14V19a2 2 0 01-2 2h-5a2 2 0 01-2-2v-3A8 8 0 0110 2z" fill="none" stroke="${NAVY}" stroke-width="1.3"/><line x1="7.5" y1="19" x2="12.5" y2="19" stroke="${NAVY}" stroke-width="0.9"/></g>`,
     // Handshake
-    `<g><path d="M0 8h4l4 4 4-4h4" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12l-4 0" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round"/><path d="M12 12l4 0" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round"/></g>`,
-    // Phone/mobile
-    `<g><rect x="2" y="0" width="10" height="18" rx="2" fill="none" stroke="${NAVY}" stroke-width="1.2"/><circle cx="7" cy="15" r="1" fill="${NAVY}"/><line x1="5" y1="3" x2="9" y2="3" stroke="${NAVY}" stroke-width="0.8" stroke-linecap="round"/></g>`,
-    // Shield/trust
-    `<g><path d="M8 1L1 5v5c0 4.5 3.5 7.5 7 9 3.5-1.5 7-4.5 7-9V5z" fill="none" stroke="${NAVY}" stroke-width="1.2"/><polyline points="5,9 7.5,12 12,6" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+    `<g><path d="M0 10h5l5 5.5 5-5.5h5" fill="none" stroke="${NAVY}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15l-5 0" fill="none" stroke="${NAVY}" stroke-width="1.3" stroke-linecap="round"/><path d="M15 15l5 0" fill="none" stroke="${NAVY}" stroke-width="1.3" stroke-linecap="round"/></g>`,
+    // Phone
+    `<g><rect x="2" y="0" width="14" height="24" rx="3" fill="none" stroke="${NAVY}" stroke-width="1.3"/><circle cx="9" cy="20" r="1.3" fill="${NAVY}"/><line x1="6" y1="3.5" x2="12" y2="3.5" stroke="${NAVY}" stroke-width="1" stroke-linecap="round"/></g>`,
+    // Shield
+    `<g><path d="M10 1L1 6v6.5c0 6 4.5 10 9 12 4.5-2 9-6 9-12V6z" fill="none" stroke="${NAVY}" stroke-width="1.3"/><polyline points="6,11.5 9,15 15,8" fill="none" stroke="${NAVY}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></g>`,
     // Rocket
-    `<g><path d="M10 2C6 6 4 12 4 16l3-1 3 3 3-3 3 1c0-4-2-10-6-14z" fill="none" stroke="${NAVY}" stroke-width="1.2" stroke-linejoin="round"/><circle cx="10" cy="9" r="2" fill="none" stroke="${NAVY}" stroke-width="1"/></g>`,
+    `<g><path d="M12 2C7 7 5 14 5 20l4-1.5 3 4 3-4 4 1.5c0-6-2-13-7-18z" fill="none" stroke="${NAVY}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="12" cy="11" r="2.5" fill="none" stroke="${NAVY}" stroke-width="1.1"/></g>`,
   ]
 
   const phrases = [
     'Parce', 'De una', 'Bacano', 'Camello', 'Plata',
-    'Yave', 'Dale', 'Fresco', 'Berraco', 'Gonorrea',
-    'Chimba', 'Parcero', 'Llave', 'Severo', 'Teso',
+    'Yave', 'Dale', 'Fresco', 'Berraco', 'Chimba',
+    'Parcero', 'Llave', 'Severo', 'Teso', 'Quiubo',
   ]
 
-  const positions: Array<{ x: number; y: number; rot: number; iconIdx?: number; text?: string; fontSize?: number }> = []
-  const gridCols = 10
-  const gridRows = 10
+  const gridCols = 8
+  const gridRows = 8
   const cellW = W / gridCols
   const cellH = H / gridRows
 
+  let content = ''
   let phraseIdx = 0
+
   for (let row = 0; row < gridRows; row++) {
     for (let col = 0; col < gridCols; col++) {
       const cx = col * cellW + cellW / 2
       const cy = row * cellH + cellH / 2
-      const jitterX = ((col * 7 + row * 13) % 30) - 15
-      const jitterY = ((col * 11 + row * 7) % 26) - 13
-      const rot = ((col * 17 + row * 23) % 90) - 45
+      const jitterX = ((col * 7 + row * 13) % 24) - 12
+      const jitterY = ((col * 11 + row * 7) % 20) - 10
+      const rot = ((col * 17 + row * 23) % 70) - 35
       const x = cx + jitterX
       const y = cy + jitterY
 
       if ((row + col) % 3 === 0) {
-        positions.push({ x, y, rot, text: phrases[phraseIdx % phrases.length], fontSize: 9 + ((row + col) % 3) * 2 })
+        const size = 12 + ((row + col) % 3) * 2
+        content += `<text x="${x}" y="${y}" font-family="'Nunito Sans',sans-serif" font-size="${size}" font-weight="800" fill="${NAVY}" transform="rotate(${rot} ${x} ${y})" text-anchor="middle" dominant-baseline="middle">${phrases[phraseIdx % phrases.length]}</text>`
         phraseIdx++
       } else {
         const iconIdx = (row * gridCols + col) % icons.length
-        positions.push({ x, y, rot, iconIdx })
+        content += `<g transform="translate(${x - 10},${y - 10}) rotate(${rot} 10 10)">${icons[iconIdx]}</g>`
       }
-    }
-  }
-
-  let content = ''
-  for (const p of positions) {
-    if (p.text != null) {
-      content += `<text x="${p.x}" y="${p.y}" font-family="'Nunito Sans',sans-serif" font-size="${p.fontSize}" font-weight="800" fill="${NAVY}" transform="rotate(${p.rot} ${p.x} ${p.y})" text-anchor="middle" dominant-baseline="middle">${p.text}</text>`
-    } else if (p.iconIdx != null) {
-      content += `<g transform="translate(${p.x - 8},${p.y - 8}) rotate(${p.rot} 8 8) scale(0.9)">${icons[p.iconIdx]}</g>`
     }
   }
 
@@ -90,7 +83,7 @@ export function BrandPattern() {
       style={{
         backgroundImage: getTile(),
         backgroundRepeat: 'repeat',
-        backgroundSize: '800px 800px',
+        backgroundSize: '700px 700px',
       }}
     />
   )

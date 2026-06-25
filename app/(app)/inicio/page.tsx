@@ -198,11 +198,11 @@ function ActiveState({ coins, rankIndex }: { coins: number; rankIndex: number })
         </p>
 
         <Link
-          href="/pagos"
+          href="/pagos?direct=1"
           className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-white shadow-lg shadow-orange/25 transition-all hover:brightness-110 active:translate-y-px"
         >
           <CreditCard className="size-5" />
-          Paga tu credito
+          Paga tu cuota aqui
         </Link>
       </div>
 
@@ -319,7 +319,7 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
       </div>
 
       {/* Configuration card */}
-      <div className="rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border">
+      <div className="rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-border">
         {/* Frequency indicator */}
         <div className="mb-5 flex items-center gap-3">
           <div className={`flex-1 rounded-xl p-3 text-center text-sm font-bold ${tier.freq === 'quincenal' ? 'bg-navy text-white' : 'bg-muted text-muted-foreground'}`}>
@@ -347,7 +347,7 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between">
             <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-              <Wallet className="size-4 text-navy" />
+              <Wallet className="size-4 text-orange" />
               Monto solicitado
             </span>
             <span className="font-heading text-xl font-extrabold text-navy">{cop(amount)}</span>
@@ -362,7 +362,7 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
             className="yave-slider"
             aria-label="Monto"
             style={{
-              background: `linear-gradient(to right, var(--navy) 0%, var(--navy) ${sliderPct}%, var(--muted) ${sliderPct}%, var(--muted) 100%)`,
+              background: `linear-gradient(to right, var(--orange) 0%, var(--orange) ${sliderPct}%, var(--muted) ${sliderPct}%, var(--muted) 100%)`,
             }}
           />
           <div className="mt-1 flex justify-between text-xs text-muted-foreground">
@@ -375,7 +375,7 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between">
             <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-              <CalendarDays className="size-4 text-navy" />
+              <CalendarDays className="size-4 text-orange" />
               Plazo
             </span>
             <span className="font-heading text-lg font-extrabold text-navy">
@@ -392,7 +392,7 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
             className="yave-slider"
             aria-label="Plazo"
             style={{
-              background: `linear-gradient(to right, var(--navy) 0%, var(--navy) ${termPct}%, var(--muted) ${termPct}%, var(--muted) 100%)`,
+              background: `linear-gradient(to right, var(--orange) 0%, var(--orange) ${termPct}%, var(--muted) ${termPct}%, var(--muted) 100%)`,
             }}
           />
           <div className="mt-1 flex justify-between text-xs text-muted-foreground">
@@ -434,15 +434,19 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
                 className="overflow-hidden"
               >
                 <div className="flex flex-col gap-2.5 pt-4 text-sm">
-                  <BreakdownRow label="Monto solicitado" value={cop(amount)} />
+                  <BreakdownRow icon={Wallet} iconBg="bg-orange/20 text-orange" label="Monto solicitado" value={cop(amount)} />
                   <BreakdownRow
+                    icon={TrendingUp}
+                    iconBg="bg-yellow/20 text-yellow"
                     label="Intereses"
                     sub={`${(ratePerPeriod * 100).toFixed(1)}% ${tier.freq === 'mensual' ? 'E.M.' : 'por quincena'}`}
                     value={cop(credit.interest)}
                   />
-                  <BreakdownRow label="Fianza (12%)" value={cop(credit.fianza)} />
-                  <BreakdownRow label="Cuota administrativa (5%)" value={cop(credit.adminFee)} />
+                  <BreakdownRow icon={ShieldCheck} iconBg="bg-orange/20 text-orange" label="Fianza (12%)" value={cop(credit.fianza)} />
+                  <BreakdownRow icon={BadgeDollarSign} iconBg="bg-navy/20 text-white" label="Cuota administrativa (5%)" value={cop(credit.adminFee)} />
                   <BreakdownRow
+                    icon={CreditCard}
+                    iconBg="bg-yellow/20 text-yellow"
                     label="Yave Pass"
                     sub={tier.freq === 'mensual'
                       ? `$15.000/mes x ${periods}`
@@ -474,14 +478,21 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
   )
 }
 
-function BreakdownRow({ label, sub, value }: { label: string; sub?: string; value: string }) {
+function BreakdownRow({ icon: Icon, iconBg, label, sub, value }: { icon?: React.ComponentType<{ className?: string; strokeWidth?: number }>; iconBg?: string; label: string; sub?: string; value: string }) {
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <span className="font-bold text-white">{label}</span>
-        <span className="font-bold text-white">{value}</span>
+    <div className="flex items-start gap-2.5">
+      {Icon && iconBg && (
+        <span className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
+          <Icon className="size-4" strokeWidth={2.5} />
+        </span>
+      )}
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-white">{label}</span>
+          <span className="font-bold text-white">{value}</span>
+        </div>
+        {sub && <p className="text-xs text-white/50">{sub}</p>}
       </div>
-      {sub && <p className="text-xs text-white/50">{sub}</p>}
     </div>
   )
 }

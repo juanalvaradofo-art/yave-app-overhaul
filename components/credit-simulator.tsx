@@ -62,7 +62,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
   const rank = ranks[rankIndex]
 
   return (
-    <div className="rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border">
+    <div className="rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-border">
       <div className="mb-6 flex items-center justify-between gap-3">
         <h3 className="font-heading text-xl font-extrabold text-navy">
           Simula tu credito
@@ -96,7 +96,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
           <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-            <Wallet className="size-4 text-navy" />
+            <Wallet className="size-4 text-orange" />
             Cuanto necesitas?
           </span>
           <span className="font-heading text-xl font-extrabold text-navy">
@@ -113,7 +113,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
           className="yave-slider"
           aria-label="Monto del credito"
           style={{
-            background: `linear-gradient(to right, var(--navy) 0%, var(--navy) ${sliderPct}%, var(--muted) ${sliderPct}%, var(--muted) 100%)`,
+            background: `linear-gradient(to right, var(--orange) 0%, var(--orange) ${sliderPct}%, var(--muted) ${sliderPct}%, var(--muted) 100%)`,
           }}
         />
         <div className="mt-1 flex justify-between text-xs text-muted-foreground">
@@ -126,7 +126,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
           <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-            <CalendarDays className="size-4 text-navy" />
+            <CalendarDays className="size-4 text-orange" />
             Plazo
           </span>
           <span className="font-heading text-lg font-extrabold text-navy">
@@ -143,7 +143,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
           className="yave-slider"
           aria-label="Plazo"
           style={{
-            background: `linear-gradient(to right, var(--navy) 0%, var(--navy) ${termPct}%, var(--muted) ${termPct}%, var(--muted) 100%)`,
+            background: `linear-gradient(to right, var(--orange) 0%, var(--orange) ${termPct}%, var(--muted) ${termPct}%, var(--muted) 100%)`,
           }}
         />
         <div className="mt-1 flex justify-between text-xs text-muted-foreground">
@@ -185,10 +185,10 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
               className="relative overflow-hidden"
             >
               <div className="flex flex-col gap-3 pt-4">
-                <CostRow icon={Wallet} iconBg="bg-white/10" label="Monto solicitado" value={cop(amount)} />
+                <CostRow icon={Wallet} iconBg="bg-orange/20 text-orange" label="Monto solicitado" value={cop(amount)} />
                 <CostRow
                   icon={TrendingUp}
-                  iconBg="bg-white/10"
+                  iconBg="bg-yellow/20 text-yellow"
                   label="Intereses"
                   sublabel={`${(ratePerPeriod * 100).toFixed(1)}% ${tier.freq === 'mensual' ? 'E.M.' : 'por quincena'}`}
                   value={cop(interest)}
@@ -202,7 +202,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
                 />
                 <CostRow
                   icon={BadgeDollarSign}
-                  iconBg="bg-white/10"
+                  iconBg="bg-navy/20 text-white"
                   label="Cuota administrativa (5%)"
                   sublabel="Firma, estudio y plataforma"
                   value={cop(adminFee)}
@@ -257,7 +257,7 @@ function CostRow({
 }) {
   return (
     <div className="flex items-start gap-2.5">
-      <span className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-white ${iconBg}`}>
+      <span className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
         <Icon className="size-4" strokeWidth={2.5} />
       </span>
       <div className="flex-1">

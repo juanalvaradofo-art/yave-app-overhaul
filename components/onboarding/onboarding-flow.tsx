@@ -1,16 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Camera, Check, CloudUpload, FileText, Loader as Loader2, Mail, ScanFace, Smartphone, Wallet, ChevronDown, Sparkles, Target, ShieldCheck, TrendingUp } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Check, CloudUpload, FileText, Loader as Loader2, Mail, ScanFace, Wallet, ChevronDown, Sparkles, Target, ShieldCheck, TrendingUp, CalendarDays, KeyRound } from 'lucide-react'
 import { YaveLogo } from '@/components/yave-logo'
 import { MascotGold } from '@/components/mascot-gold'
 import { OtpInput } from '@/components/otp-input'
+import { ranks } from '@/lib/yave-data'
 
 type Mode = 'signup' | 'application'
 
 const SIGNUP_STEPS = ['Registro', 'Verificacion'] as const
-const APPLICATION_STEPS = ['Solicitud', 'Proposito', 'Documentos', 'Identidad', 'Firma'] as const
+const APPLICATION_STEPS = ['Simulacion', 'Solicitud', 'Proposito', 'Documentos', 'Validacion'] as const
 
 const PURPOSE_OPTIONS = [
   'Consumo',
@@ -39,7 +40,6 @@ export function OnboardingFlow({
   const steps = mode === 'signup' ? SIGNUP_STEPS : APPLICATION_STEPS
   const [step, setStep] = useState(0)
   const [otp, setOtp] = useState('')
-  const [signOtp, setSignOtp] = useState('')
   const [studying, setStudying] = useState(false)
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1))
@@ -110,20 +110,11 @@ export function OnboardingFlow({
               />
             )}
 
-            {mode === 'application' && step === 0 && <ApplicationStep onNext={next} />}
-            {mode === 'application' && step === 1 && <PropositoStep onNext={next} />}
-            {mode === 'application' && step === 2 && <DocumentsStep onNext={next} />}
-            {mode === 'application' && step === 3 && <IdentityStep onNext={next} />}
-            {mode === 'application' && step === 4 && (
-              <OtpStep
-                title="Firma con tu codigo"
-                desc="Esta firma digital confirma tu solicitud. Ingresa el codigo que te enviamos por SMS."
-                value={signOtp}
-                onChange={setSignOtp}
-                onNext={finishApplication}
-                cta="Firmar y enviar"
-              />
-            )}
+            {mode === 'application' && step === 0 && <SimulatorStep onNext={next} />}
+            {mode === 'application' && step === 1 && <ApplicationStep onNext={next} />}
+            {mode === 'application' && step === 2 && <PropositoStep onNext={next} />}
+            {mode === 'application' && step === 3 && <DocumentsStep onNext={next} />}
+            {mode === 'application' && step === 4 && <IdentityStep onNext={finishApplication} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -157,6 +148,149 @@ function PrimaryButton({
     >
       {children}
     </button>
+  )
+}
+
+const RATE_MONTHLY = 0.022
+const FIANZA_PCT = 0.12
+const ADMIN_FEE_PCT = 0.05
+const YAVE_PASS_MONTHLY = 15_000
+
+function cop(n: number) {
+  return '$ ' + Math.round(n).toLocaleString('es-CO')
+}
+
+function SimulatorStep({ onNext }: { onNext: () => void }) {
+  const rank = ranks[0]
+  const maxAmount = rank.cupoValue
+  const minAmount = 200_000
+
+  const [amount, setAmount] = useState(300_000)
+  const [periods, setPeriods] = useState(3)
+
+  const interest = amount * RATE_MONTHLY * (periods * 0.5)
+  const fianza = amount * FIANZA_PCT
+  const adminFee = amount * ADMIN_FEE_PCT
+  const yavePass = (YAVE_PASS_MONTHLY / 2) * periods
+  const total = amount + interest + fianza + adminFee + yavePass
+  const perInstallment = total / periods
+
+  const sliderPct = ((amount - minAmount) / (maxAmount - minAmount)) * 100
+  const termPct = ((periods - 1) / 3) * 100
+
+  return (
+    <div>
+      <StepTitle
+        title="Cuanto necesitas?"
+        desc="Simula tu credito antes de solicitar. Ajusta el monto y plazo."
+      />
+
+      <div className="rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-border">
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="font-heading text-lg font-extrabold text-navy">Simulador</h3>
+          <span className="flex items-center gap-1 rounded-full bg-[#b5742a]/15 px-3 py-1 text-xs font-bold text-[#b5742a]">
+            <KeyRound className="size-3.5" />
+            Bronce
+          </span>
+        </div>
+
+        {/* Amount */}
+        <div className="mb-5">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <Wallet className="size-4 text-orange" />
+              Monto
+            </span>
+            <span className="font-heading text-xl font-extrabold text-navy">{cop(amount)}</span>
+          </div>
+          <input
+            type="range"
+            min={minAmount}
+            max={maxAmount}
+            step={50_000}
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            className="yave-slider"
+            style={{
+              background: `linear-gradient(to right, var(--orange) 0%, var(--orange) ${sliderPct}%, var(--muted) ${sliderPct}%, var(--muted) 100%)`,
+            }}
+          />
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>{cop(minAmount)}</span>
+            <span>{cop(maxAmount)}</span>
+          </div>
+        </div>
+
+        {/* Term */}
+        <div className="mb-5">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <CalendarDays className="size-4 text-orange" />
+              Plazo
+            </span>
+            <span className="font-heading text-lg font-extrabold text-navy">{periods} quincenas</span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={4}
+            step={1}
+            value={periods}
+            onChange={(e) => setPeriods(Number(e.target.value))}
+            className="yave-slider"
+            style={{
+              background: `linear-gradient(to right, var(--orange) 0%, var(--orange) ${termPct}%, var(--muted) ${termPct}%, var(--muted) 100%)`,
+            }}
+          />
+        </div>
+
+        {/* Result */}
+        <div className="rounded-2xl bg-navy p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-white/70">Cuota quincenal</span>
+            <span className="font-heading text-2xl font-extrabold text-orange">{cop(perInstallment)}</span>
+          </div>
+          <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-3">
+            <span className="text-sm font-bold text-white">Total a pagar</span>
+            <span className="font-heading font-extrabold text-white">{cop(total)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Benefits grid */}
+      <div className="mt-6 grid grid-cols-2 gap-3">
+        {[
+          { icon: BarChartIcon, label: 'Scoring Alternativo', desc: 'No solo miramos buro' },
+          { icon: ShieldCheck, label: 'Costos Justos', desc: 'Sin cargos ocultos' },
+          { icon: Sparkles, label: 'Premios y Rewards', desc: 'Yave Coins en cada pago' },
+          { icon: TrendingUp, label: 'Cupo Progresivo', desc: 'Crece con tus pagos' },
+        ].map((b) => {
+          const Icon = b.icon
+          return (
+            <div key={b.label} className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-border">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-orange/10 text-orange">
+                <Icon className="size-4" strokeWidth={2.5} />
+              </span>
+              <p className="mt-2 font-heading text-sm font-bold text-navy">{b.label}</p>
+              <p className="text-xs text-muted-foreground">{b.desc}</p>
+            </div>
+          )
+        })}
+      </div>
+
+      <PrimaryButton onClick={onNext}>
+        Continuar con solicitud
+        <ArrowRight className="size-5" />
+      </PrimaryButton>
+    </div>
+  )
+}
+
+function BarChartIcon({ className, strokeWidth }: { className?: string; strokeWidth?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
   )
 }
 
@@ -371,7 +505,7 @@ const docItems = [
   {
     icon: FileText,
     label: 'Soportes de Ingresos',
-    hint: 'Puedes subir extractos, fotos, comprobantes, facturas de tu negocio, cupones de pago o pantallazos de tus cuentas. Sube lo que tengas para demostrar tus ingresos.',
+    hint: 'Puedes subir extractos, fotos, comprobantes, facturas de tu negocio, cupones de pago o pantallazos de tus cuentas.',
     isCamera: false,
   },
 ]
@@ -478,8 +612,8 @@ function IdentityStep({ onNext }: { onNext: () => void }) {
   return (
     <div>
       <StepTitle
-        title="Validemos que eres tu"
-        desc="Una foto rapida de tu rostro. Solo unos segundos."
+        title="Validacion de identidad"
+        desc="Una foto rapida de tu rostro para verificar que eres tu."
       />
       <div className="flex flex-col items-center rounded-3xl bg-navy p-8 text-white">
         <motion.span
@@ -496,7 +630,7 @@ function IdentityStep({ onNext }: { onNext: () => void }) {
         </motion.span>
         <p className="mt-5 text-center leading-relaxed text-white/75">
           {captured
-            ? 'Identidad capturada correctamente'
+            ? 'Identidad verificada correctamente'
             : 'Centra tu rostro en el marco y manten buena luz.'}
         </p>
       </div>
@@ -504,7 +638,7 @@ function IdentityStep({ onNext }: { onNext: () => void }) {
         <PrimaryButton onClick={() => setCaptured(true)}>Tomar foto</PrimaryButton>
       ) : (
         <PrimaryButton onClick={onNext}>
-          Continuar
+          Enviar solicitud
           <ArrowRight className="size-5" />
         </PrimaryButton>
       )}
