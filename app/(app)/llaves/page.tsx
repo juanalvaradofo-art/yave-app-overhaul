@@ -11,8 +11,9 @@ import {
   CalendarCheck,
   Clock,
   ArrowRight,
+  TrendingUp,
 } from 'lucide-react'
-import { Mascot } from '@/components/mascot'
+import { RankMascot } from '@/components/mascot'
 import { TransactionLog } from '@/components/transaction-log'
 import { PaymentSheet } from '@/components/payment-sheet'
 import { ranks, xpRules } from '@/lib/yave-data'
@@ -30,6 +31,7 @@ export default function LlavesPage() {
     ? Math.min(100, Math.round(((xp - current.xpMin) / (next.xpMin - current.xpMin)) * 100))
     : 100
   const xpToNext = next ? Math.max(0, next.xpMin - xp) : 0
+  const cupoIncrease = next ? next.cupoValue - current.cupoValue : 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,7 +55,7 @@ export default function LlavesPage() {
           >
             Tu llave actual
           </span>
-          <Mascot size={56} alt="" tint={current.tint} />
+          <RankMascot size={60} rankColor={current.color} alt="" />
         </div>
         <p
           className="mt-2 font-heading text-4xl font-extrabold"
@@ -122,19 +124,43 @@ export default function LlavesPage() {
           >
             {next.name}
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
-            <div>
-              <p className="text-muted-foreground">Cupo máximo</p>
-              <p className="font-heading font-bold text-navy">{next.cupo}</p>
+
+          {/* Cupo increase example — we show the jump, never the total */}
+          {cupoIncrease > 0 ? (
+            <div
+              className="mt-3 flex items-center gap-2 rounded-2xl px-4 py-3"
+              style={{ backgroundColor: `${next.color}1a`, color: next.color }}
+            >
+              <TrendingUp className="size-5 shrink-0" strokeWidth={2.5} />
+              <p className="font-heading text-lg font-extrabold">
+                + ${cupoIncrease.toLocaleString('es-CO')} de cupo
+              </p>
             </div>
-            <div>
-              <p className="text-muted-foreground">XP requerida</p>
-              <p className="font-heading font-bold text-navy">{next.xp}</p>
-            </div>
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            {next.benefit}
+          ) : null}
+
+          {/* Concrete perks unlocked at the next rank */}
+          <p className="mt-4 text-sm font-bold text-muted-foreground">
+            Lo que desbloqueas
           </p>
+          <ul className="mt-2 flex flex-col gap-2.5">
+            {next.perks.map((perk) => (
+              <li key={perk} className="flex items-start gap-2.5">
+                <CheckCircle2
+                  className="mt-0.5 size-5 shrink-0"
+                  style={{ color: next.color }}
+                  strokeWidth={2.5}
+                />
+                <span className="text-sm font-semibold leading-snug text-navy">
+                  {perk}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-sm">
+            <span className="text-muted-foreground">XP requerida</span>
+            <span className="font-heading font-bold text-navy">{next.xp}</span>
+          </div>
         </div>
       ) : null}
 
@@ -174,11 +200,16 @@ export default function LlavesPage() {
           />
           <MechanicRow
             icon={Clock}
-            tone="muted"
-            title="Mora"
-            reward={`${xpRules.moraPerDay.coins} coins por día`}
+            tone="danger"
+            title="Mora (pago tarde)"
+            reward={`${xpRules.moraPerDay.xp} XP · ${xpRules.moraPerDay.coins} coins / día`}
           />
         </div>
+        <p className="mt-2 px-1 text-xs leading-relaxed text-muted-foreground">
+          Pagar tarde te resta XP y Yave Coins. Si acumulas mucha mora puedes
+          bajar de llave (por ejemplo, de Plata a Bronce). Pagar a tiempo siempre
+          te mantiene subiendo.
+        </p>
         <button
           type="button"
           onClick={() => setPayOpen(true)}
@@ -214,7 +245,7 @@ function MechanicRow({
   reward,
 }: {
   icon: typeof Zap
-  tone: 'orange' | 'navy' | 'muted'
+  tone: 'orange' | 'navy' | 'muted' | 'danger'
   title: string
   reward: string
 }) {
@@ -226,13 +257,19 @@ function MechanicRow({
             ? 'bg-orange text-orange-foreground'
             : tone === 'navy'
               ? 'bg-navy text-navy-foreground'
-              : 'bg-muted text-muted-foreground'
+              : tone === 'danger'
+                ? 'bg-destructive/15 text-destructive'
+                : 'bg-muted text-muted-foreground'
         }`}
       >
         <Icon className="size-5" strokeWidth={2.5} />
       </span>
       <p className="flex-1 font-heading font-bold text-navy">{title}</p>
-      <span className="text-sm font-bold text-orange">{reward}</span>
+      <span
+        className={`text-sm font-bold ${tone === 'danger' ? 'text-destructive' : 'text-orange'}`}
+      >
+        {reward}
+      </span>
     </div>
   )
 }

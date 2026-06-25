@@ -6,10 +6,10 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { useEffect } from 'react'
 
 export function FloatingPayButton() {
-  // Sticks to the right edge, vertically centered, with a gentle scroll-driven bob.
-  // Stays draggable so it never blocks content.
+  // A "gotica" (drop/pill) tab anchored to the right edge, vertically centered,
+  // with a gentle scroll-driven bob. Stays draggable so it never blocks content.
   const scrollY = useMotionValue(0)
-  const offset = useTransform(scrollY, (v) => Math.sin(v / 240) * 8)
+  const offset = useTransform(scrollY, (v) => Math.sin(v / 240) * 6)
   const y = useSpring(offset, { stiffness: 120, damping: 18 })
 
   useEffect(() => {
@@ -24,19 +24,19 @@ export function FloatingPayButton() {
       dragMomentum={false}
       dragElastic={0.15}
       style={{ y }}
-      whileTap={{ scale: 0.94 }}
+      whileTap={{ scale: 0.95 }}
       whileDrag={{ scale: 1.05 }}
-      className="fixed right-4 top-1/2 z-40 -translate-y-1/2 cursor-grab active:cursor-grabbing"
+      className="fixed right-0 top-1/2 z-40 -translate-y-1/2 cursor-grab active:cursor-grabbing"
     >
       <Link
         href="/onboarding"
-        aria-label="Realiza tu pago"
-        className="flex flex-col items-center gap-1 rounded-full bg-orange px-4 py-4 font-heading text-xs font-bold text-orange-foreground shadow-lg shadow-orange/30"
+        aria-label="Paga aquí"
+        className="flex items-center gap-2 rounded-l-full bg-orange py-3 pl-5 pr-4 font-heading text-sm font-extrabold text-orange-foreground shadow-lg shadow-orange/40 ring-1 ring-orange/20 transition-transform"
       >
-        <CreditCard className="size-6" />
-        <span className="leading-tight [writing-mode:vertical-rl] rotate-180">
-          Realiza tu pago
+        <span className="flex size-7 items-center justify-center rounded-full bg-white/20">
+          <CreditCard className="size-4" strokeWidth={2.5} />
         </span>
+        Paga aquí
       </Link>
     </motion.div>
   )

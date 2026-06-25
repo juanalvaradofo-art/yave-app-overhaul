@@ -56,9 +56,9 @@ export function CreditSimulator() {
     {
       icon: ShieldCheck,
       label: 'Yave te respalda',
-      value: 'Cubierto',
+      value: 'Lo cubre Yave',
       strike: cop(fianza),
-      note: `Fianza del 12% que normalmente pagarías. La asumimos nosotros por ti.`,
+      note: `Es el respaldo (fianza) de tu crédito. No lo pagas tú: lo asume Yave y no se suma a tu total.`,
       tone: 'green' as const,
     },
     {

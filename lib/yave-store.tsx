@@ -29,11 +29,14 @@ type YaveState = {
   logs: LogEntry[]
   /** Set when a payment pushes XP past the next threshold; drives the celebration overlay. */
   rankUpTo: number | null
+  /** Set when a late payment drops the user below their previous rank. */
+  rankDownTo: number | null
   setHasCupo: (v: boolean) => void
   requestCupo: () => void
   registerPayment: (type: PaymentType, moraDays?: number) => void
   redeem: (cost: number, label: string) => void
   clearRankUp: () => void
+  clearRankDown: () => void
 }
 
 const YaveContext = createContext<YaveState | null>(null)
@@ -61,6 +64,7 @@ export function YaveProvider({ children }: { children: ReactNode }) {
   const [xp, setXp] = useState(520) // Bronce, close to Plata (600)
   const [coins, setCoins] = useState(3450)
   const [rankUpTo, setRankUpTo] = useState<number | null>(null)
+  const [rankDownTo, setRankDownTo] = useState<number | null>(null)
   const [logs, setLogs] = useState<LogEntry[]>([
     { id: id(), kind: 'coins', label: 'Pago a tiempo · 12 jun', delta: 200, date: '12 jun' },
     { id: id(), kind: 'xp', label: 'Pago a tiempo · 12 jun', delta: 100, date: '12 jun' },
@@ -77,12 +81,19 @@ export function YaveProvider({ children }: { children: ReactNode }) {
     (type: PaymentType, moraDays = 1) => {
       const prevIndex = rankIndexForXp(xp)
       if (type === 'mora') {
-        const delta = xpRules.moraPerDay.coins * moraDays
-        setCoins((c) => Math.max(0, c + delta))
+        const coinDelta = xpRules.moraPerDay.coins * moraDays
+        const xpDelta = xpRules.moraPerDay.xp * moraDays
+        const newXp = Math.max(0, xp + xpDelta)
+        const dayLabel = `${moraDays} día${moraDays > 1 ? 's' : ''}`
+        setXp(newXp)
+        setCoins((c) => Math.max(0, c + coinDelta))
         setLogs((l) => [
-          { id: id(), kind: 'coins', label: `${xpRules.moraPerDay.label} (${moraDays} día${moraDays > 1 ? 's' : ''})`, delta, date: today() },
+          { id: id(), kind: 'coins', label: `${xpRules.moraPerDay.label} (${dayLabel})`, delta: coinDelta, date: today() },
+          { id: id(), kind: 'xp', label: `${xpRules.moraPerDay.label} (${dayLabel})`, delta: xpDelta, date: today() },
           ...l,
         ])
+        const newIndex = rankIndexForXp(newXp)
+        if (newIndex < prevIndex) setRankDownTo(newIndex)
         return
       }
       const rule = xpRules[type]
@@ -109,6 +120,7 @@ export function YaveProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const clearRankUp = useCallback(() => setRankUpTo(null), [])
+  const clearRankDown = useCallback(() => setRankDownTo(null), [])
 
   const value = useMemo<YaveState>(
     () => ({
@@ -119,13 +131,15 @@ export function YaveProvider({ children }: { children: ReactNode }) {
       rankIndex,
       logs,
       rankUpTo,
+      rankDownTo,
       setHasCupo,
       requestCupo,
       registerPayment,
       redeem,
       clearRankUp,
+      clearRankDown,
     }),
-    [hasCupo, xp, coins, rankIndex, logs, rankUpTo, requestCupo, registerPayment, redeem, clearRankUp],
+    [hasCupo, xp, coins, rankIndex, logs, rankUpTo, rankDownTo, requestCupo, registerPayment, redeem, clearRankUp, clearRankDown],
   )
 
   return <YaveContext.Provider value={value}>{children}</YaveContext.Provider>

@@ -34,25 +34,28 @@ export type Rank = {
   xpMin: number
   benefit: string
   color: string
-  /** CSS filter applied to the base bronze mascot to tint its metal to the rank tone. */
-  tint: string
+  /** Concrete next-rank benefits shown in the "próximo rango" view. */
+  perks: string[]
+  /** Numeric max quota (COP) used to compute the cupo increase between ranks. */
+  cupoValue: number
 }
 
 export const ranks: Rank[] = [
-  { name: 'Bronce', frecuencia: 'Quincenal', cupo: '$300.000', tiempo: 'Día 0', xp: '0–599', xpMin: 0, benefit: 'Acceso básico a Yave Coins.', color: '#b5742a', tint: '' },
-  { name: 'Plata', frecuencia: 'Quincenal', cupo: '$375.000', tiempo: '3 Meses', xp: '600', xpMin: 600, benefit: 'Incremento de cupo.', color: '#9aa3b2', tint: 'grayscale(1) brightness(1.18) contrast(0.92)' },
-  { name: 'Oro', frecuencia: 'Quincenal', cupo: '$475.000', tiempo: '6 Meses', xp: '1.200', xpMin: 1200, benefit: 'Apertura de La Bóveda.', color: '#e0a309', tint: 'saturate(1.5) brightness(1.1) hue-rotate(-6deg)' },
-  { name: 'Platino', frecuencia: 'Mensual', cupo: '$600.000', tiempo: '10 Meses', xp: '2.000', xpMin: 2000, benefit: 'Hito de confort y mejores plazos.', color: '#5f7d95', tint: 'grayscale(0.7) brightness(1.12) hue-rotate(175deg) saturate(0.85)' },
-  { name: 'Esmeralda', frecuencia: 'Mensual', cupo: '$750.000', tiempo: '14 Meses', xp: '2.800', xpMin: 2800, benefit: 'Tasa preferencial en Bóveda.', color: '#1f9d6b', tint: 'hue-rotate(75deg) saturate(1.4) brightness(1.05)' },
-  { name: 'Diamante', frecuencia: 'Mensual', cupo: '$925.000', tiempo: '19 Meses', xp: '3.800', xpMin: 3800, benefit: 'Soporte VIP y exoneración de YavePass.', color: '#3aa6c9', tint: 'hue-rotate(150deg) saturate(1.3) brightness(1.12)' },
-  { name: 'Maestra', frecuencia: 'Mensual', cupo: '$1.150.000', tiempo: '25+ Meses', xp: '5.000', xpMin: 5000, benefit: 'Olimpo: multiplicador XP x2.', color: '#7b3ff2', tint: 'hue-rotate(228deg) saturate(1.5) brightness(1.05)' },
+  { name: 'Bronce', frecuencia: 'Quincenal', cupo: '$300.000', tiempo: 'Día 0', xp: '0–599', xpMin: 0, benefit: 'Acceso básico a Yave Coins.', color: '#b5742a', cupoValue: 300000, perks: ['Acceso de entrada a Yave Coins', 'Mitigación de riesgo con amortización quincenal corta'] },
+  { name: 'Plata', frecuencia: 'Quincenal', cupo: '$375.000', tiempo: '3 Meses', xp: '600', xpMin: 600, benefit: 'Incremento de cupo.', color: '#9aa3b2', cupoValue: 375000, perks: ['Incremento automático del cupo de crédito disponible'] },
+  { name: 'Oro', frecuencia: 'Quincenal', cupo: '$475.000', tiempo: '6 Meses', xp: '1.200', xpMin: 1200, benefit: 'Apertura de La Bóveda.', color: '#e0a309', cupoValue: 475000, perks: ['Apertura de "La Bóveda": redime tus Yave Coins por premios', 'Catálogo de beneficios desbloqueado'] },
+  { name: 'Platino', frecuencia: 'Mensual', cupo: '$600.000', tiempo: '10 Meses', xp: '2.000', xpMin: 2000, benefit: 'Hito de confort y mejores plazos.', color: '#5f7d95', cupoValue: 600000, perks: ['Hito de confort: se unifica el cobro a una sola cuota mensual'] },
+  { name: 'Esmeralda', frecuencia: 'Mensual', cupo: '$750.000', tiempo: '14 Meses', xp: '2.800', xpMin: 2800, benefit: 'Tasa preferencial en Bóveda.', color: '#1f9d6b', cupoValue: 750000, perks: ['Tasa de conversión preferencial en La Bóveda para el canje de monedas'] },
+  { name: 'Diamante', frecuencia: 'Mensual', cupo: '$925.000', tiempo: '19 Meses', xp: '3.800', xpMin: 3800, benefit: 'Soporte VIP y exoneración de YavePass.', color: '#3aa6c9', cupoValue: 925000, perks: ['Soporte técnico VIP prioritario con Yave', 'Exoneración del Yave Pass (1 cada 6 meses)'] },
+  { name: 'Maestra', frecuencia: 'Mensual', cupo: '$1.150.000', tiempo: '25+ Meses', xp: '5.000', xpMin: 5000, benefit: 'Olimpo: multiplicador XP x2.', color: '#c0843a', cupoValue: 1150000, perks: ['El Olimpo Yave: multiplicador permanente de XP x2', 'Micro-seguro familiar gratuito'] },
 ]
 
 /** XP and Yave Coin rewards/penalties per payment behavior. */
 export const xpRules = {
   timely: { xp: 100, coins: 200, label: 'Pago a tiempo' },
   early: { xp: 150, coins: 300, label: 'Pago anticipado (3+ días)' },
-  moraPerDay: { coins: -10, label: 'Penalización por mora' },
+  /** Late payment: lose XP and coins. Enough mora can demote your rank. */
+  moraPerDay: { xp: -25, coins: -50, label: 'Penalización por mora' },
 } as const
 
 export const testimonials = [

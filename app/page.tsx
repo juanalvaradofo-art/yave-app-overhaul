@@ -34,13 +34,13 @@ const reasons = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen pb-28">
       <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur">
         <div className="mx-auto flex max-w-md items-center justify-between px-5 py-3">
           <YaveLogo />
           <Link
             href="/inicio"
-            className="rounded-full bg-navy px-5 py-2.5 text-sm font-bold text-navy-foreground transition-transform active:translate-y-px"
+            className="rounded-full bg-navy px-6 py-2.5 text-sm font-extrabold tracking-wide text-navy-foreground shadow-md shadow-navy/20 ring-1 ring-navy/10 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-navy/25 active:translate-y-0"
           >
             Ingresar
           </Link>
@@ -155,18 +155,18 @@ export default function LandingPage() {
 
           <div className="mt-6 grid grid-cols-2 gap-y-3 text-sm font-semibold">
             {[
-              'Habeas Data',
-              'Términos y Condiciones',
-              'Política de Privacidad',
-              'Tasas y Tarifas',
-              'SARLAFT',
+              { label: 'Habeas Data', href: '/legal/habeas-data' },
+              { label: 'Términos y Condiciones', href: '/legal/terminos' },
+              { label: 'Política de Privacidad', href: '/legal/privacidad' },
+              { label: 'Tasas y Tarifas', href: '/legal/tasas' },
+              { label: 'SARLAFT', href: '/legal/sarlaft' },
             ].map((link) => (
               <Link
-                key={link}
-                href="/"
+                key={link.label}
+                href={link.href}
                 className="text-white/80 transition-colors hover:text-yellow"
               >
-                {link}
+                {link.label}
               </Link>
             ))}
           </div>

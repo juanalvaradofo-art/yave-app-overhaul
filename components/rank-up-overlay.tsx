@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { AnimatePresence, motion } from 'framer-motion'
 import { KeyRound } from 'lucide-react'
-import { Mascot } from '@/components/mascot'
+import { RankMascot } from '@/components/mascot'
 import { ranks } from '@/lib/yave-data'
 import { useYave } from '@/lib/yave-store'
 
@@ -50,7 +50,7 @@ export function RankUpOverlay() {
               transition={{ type: 'spring', stiffness: 220, damping: 12, delay: 0.1 }}
               className="mt-3"
             >
-              <Mascot size={140} className="mx-auto" alt="" tint={rank.tint} />
+              <RankMascot size={150} rankColor={rank.color} className="mx-auto" alt="" />
             </motion.div>
             <h2
               className="mt-2 font-heading text-4xl font-extrabold"

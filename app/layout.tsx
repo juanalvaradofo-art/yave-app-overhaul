@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Baloo_2, Nunito_Sans } from 'next/font/google'
+import { BrandPattern } from '@/components/brand-pattern'
 import './globals.css'
 
 const baloo = Baloo_2({
@@ -34,9 +35,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${baloo.variable} ${nunito.variable}`}>
+    <html lang="es" className={`${baloo.variable} ${nunito.variable} bg-background`}>
       <body className="bg-background font-sans antialiased">
-        {children}
+        <BrandPattern />
+        <div className="relative z-10">{children}</div>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

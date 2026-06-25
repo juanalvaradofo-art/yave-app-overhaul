@@ -25,9 +25,9 @@ const options = [
     type: 'mora' as const,
     icon: Clock,
     title: 'Reportar mora (demo)',
-    desc: 'Simula un atraso de 3 días.',
-    reward: '−30 coins',
-    tone: 'muted' as const,
+    desc: 'Simula un atraso de 3 días. Puede bajarte de llave.',
+    reward: '−75 XP · −150 coins',
+    tone: 'danger' as const,
   },
 ]
 
@@ -96,7 +96,9 @@ export function PaymentSheet({
                           ? 'bg-orange text-orange-foreground'
                           : o.tone === 'navy'
                             ? 'bg-navy text-navy-foreground'
-                            : 'bg-muted text-muted-foreground'
+                            : o.tone === 'danger'
+                              ? 'bg-destructive/15 text-destructive'
+                              : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       <Icon className="size-5" strokeWidth={2.5} />
@@ -105,7 +107,11 @@ export function PaymentSheet({
                       <p className="font-heading font-bold text-navy">{o.title}</p>
                       <p className="text-sm text-muted-foreground">{o.desc}</p>
                     </div>
-                    <span className="flex items-center gap-1 text-xs font-bold text-orange">
+                    <span
+                      className={`flex items-center gap-1 text-xs font-bold ${
+                        o.tone === 'danger' ? 'text-destructive' : 'text-orange'
+                      }`}
+                    >
                       <KeyRound className="size-3.5" strokeWidth={2.5} />
                       {o.reward}
                     </span>

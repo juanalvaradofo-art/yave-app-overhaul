@@ -14,7 +14,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import { NotificationBell } from '@/components/notification-bell'
-import { Mascot } from '@/components/mascot'
+import { Mascot, RankMascot } from '@/components/mascot'
 import { PaymentSheet } from '@/components/payment-sheet'
 import { ApplicationOverlay } from '@/components/onboarding/application-overlay'
 import { ranks } from '@/lib/yave-data'
@@ -45,12 +45,7 @@ export default function InicioPage() {
       {/* Greeting */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span
-            className="flex size-12 items-center justify-center rounded-full border-2"
-            style={{ borderColor: rank.color, backgroundColor: `${rank.color}1a` }}
-          >
-            <Mascot size={40} alt="" tint={rank.tint} />
-          </span>
+          <RankMascot size={52} rankColor={rank.color} alt="" />
           <div>
             <p className="text-sm text-muted-foreground">Hola de nuevo,</p>
             <p className="font-heading text-lg font-extrabold text-navy">
@@ -86,7 +81,7 @@ export default function InicioPage() {
       {hasCupo ? (
         <ActiveState coins={coins} onPay={() => setPayOpen(true)} />
       ) : (
-        <EmptyState rankColor={rank.color} rankTint={rank.tint} onApply={() => setApplyOpen(true)} />
+        <EmptyState rankColor={rank.color} onApply={() => setApplyOpen(true)} />
       )}
 
       <PaymentSheet open={payOpen} onClose={() => setPayOpen(false)} />
@@ -218,11 +213,9 @@ function ActiveState({ coins, onPay }: { coins: number; onPay: () => void }) {
 
 function EmptyState({
   rankColor,
-  rankTint,
   onApply,
 }: {
   rankColor: string
-  rankTint: string
   onApply: () => void
 }) {
   return (
@@ -271,7 +264,7 @@ function EmptyState({
         className="flex items-center gap-4 rounded-[1.75rem] p-5"
         style={{ backgroundColor: `${rankColor}1f` }}
       >
-        <Mascot size={64} alt="" className="shrink-0" tint={rankTint} />
+        <Mascot size={64} alt="" className="shrink-0" />
         <div>
           <p className="font-heading font-bold text-navy">
             Estoy listo para ayudarte
