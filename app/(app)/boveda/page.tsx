@@ -81,6 +81,21 @@ export default function BovedaPage() {
         </div>
       </div>
 
+      {/* Referral CTA */}
+      <Link
+        href="/boveda/referidos"
+        className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-sm ring-1 ring-border transition-all hover:shadow-md active:translate-y-px"
+      >
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-yellow text-navy">
+          <Gift className="size-6" strokeWidth={2.5} />
+        </span>
+        <div className="flex-1">
+          <p className="font-heading font-bold text-navy">Invita y gana 500 Coins</p>
+          <p className="text-sm text-muted-foreground">Comparte tu link de referido</p>
+        </div>
+        <ArrowRight className="size-5 text-muted-foreground" />
+      </Link>
+
       {hasCupo ? (
         <VaultGrid />
       ) : (
