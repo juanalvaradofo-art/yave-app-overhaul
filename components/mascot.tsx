@@ -1,19 +1,12 @@
-import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
-const POSES = {
-  default: '/yave-mascot.png',
-  magnifier: '/mascot/yave-mascot-magnifier.png',
-  pencil: '/mascot/yave-mascot-pencil.png',
-} as const
-
-export type MascotPose = keyof typeof POSES
+export type MascotPose = 'default' | 'magnifier' | 'pencil'
 
 export function Mascot({
   className,
   size = 120,
   alt = 'Yave, tu llave amiga',
-  pose = 'default',
+  pose: _pose = 'default',
 }: {
   className?: string
   size?: number
@@ -21,21 +14,18 @@ export function Mascot({
   pose?: MascotPose
 }) {
   return (
-    <Image
-      src={POSES[pose] || POSES.default}
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/mascot/yave-mascot.png"
       width={size}
       height={size}
       alt={alt}
       className={cn('select-none object-contain', className)}
-      priority
+      draggable={false}
     />
   )
 }
 
-/**
- * Mascot wrapped in a circular ring whose color reflects the user's rank/tier.
- * The mascot art itself never changes color — only the surrounding border does.
- */
 export function RankMascot({
   rankColor,
   size = 96,

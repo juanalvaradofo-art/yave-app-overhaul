@@ -13,15 +13,15 @@ const slides = [
     title: 'El credito que te entiende',
     text: 'Pocos requisitos, respuesta en minutos y recompensas en cada pago. Pide tu plata sin enredos.',
     cta: 'Solicitar mi plata',
-    accent: 'from-navy to-[#13365E]',
+    layout: 'mascot' as const,
   },
   {
-    badge: 'Siempre con un humano',
-    icon: Headphones,
-    title: 'Te atiende gente, no robots',
-    text: 'Lineas de atencion de lunes a sabado. Hablas con un parcero de verdad cuando lo necesitas.',
-    cta: 'Hablar con Yave',
-    accent: 'from-[#0D2D4F] to-navy',
+    badge: 'Hecho en Colombia',
+    icon: Users,
+    title: 'Mas de 250.000 parceros confian en Yave',
+    text: 'Un credito justo, transparente y hecho con corazon colombiano.',
+    cta: 'Unirme ahora',
+    layout: 'flag' as const,
   },
   {
     badge: 'Gana mientras pagas',
@@ -29,7 +29,15 @@ const slides = [
     title: 'Cada pago suma Yave Coins',
     text: 'Sube de llave, desbloquea La Boveda y canjea tus monedas por beneficios reales.',
     cta: 'Conocer recompensas',
-    accent: 'from-navy to-[#0F2F52]',
+    layout: 'default' as const,
+  },
+  {
+    badge: 'Siempre con un humano',
+    icon: Headphones,
+    title: 'Te atiende gente, no robots',
+    text: 'Lineas de atencion de lunes a sabado. Hablas con un parcero de verdad.',
+    cta: 'Hablar con Yave',
+    layout: 'default' as const,
   },
   {
     badge: 'Seguridad bancaria',
@@ -37,15 +45,7 @@ const slides = [
     title: 'Tus datos estan protegidos',
     text: 'Cifrado de nivel bancario y vigilancia de la Superintendencia Financiera de Colombia.',
     cta: 'Saber mas',
-    accent: 'from-[#0E2E50] to-navy',
-  },
-  {
-    badge: 'Comunidad Yave',
-    icon: Users,
-    title: 'Mas de 250.000 parceros',
-    text: 'Unidos por un credito justo, transparente y hecho en Colombia.',
-    cta: 'Unirme ahora',
-    accent: 'from-navy to-[#122F4E]',
+    layout: 'default' as const,
   },
 ]
 
@@ -61,10 +61,23 @@ export function HeroCarousel() {
   const Icon = slide.icon
 
   return (
-    <div className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br ${slide.accent} p-6 text-white shadow-xl ring-1 ring-white/5`}>
-      {/* Decorative corner accents */}
-      <div className="absolute -right-8 -top-8 size-32 rounded-full bg-yellow/10" />
-      <div className="absolute -left-6 bottom-20 size-20 rounded-full bg-orange/8" />
+    <div className="relative overflow-hidden rounded-[2rem] bg-navy p-6 text-white shadow-xl">
+      {/* Colombian flag diagonal accent for slide 2 */}
+      {slide.layout === 'flag' && (
+        <>
+          <div className="absolute -right-4 -top-4 h-28 w-28 rotate-12 rounded-xl bg-[#FFD600] opacity-25" />
+          <div className="absolute -right-2 top-16 h-16 w-20 rotate-12 rounded-lg bg-[#003893] opacity-20" />
+          <div className="absolute right-4 top-28 h-12 w-16 rotate-12 rounded-lg bg-[#CE1126] opacity-20" />
+        </>
+      )}
+
+      {/* Default decorative circles */}
+      {slide.layout !== 'flag' && (
+        <>
+          <div className="absolute -right-8 -top-8 size-32 rounded-full bg-yellow/8" />
+          <div className="absolute -left-6 bottom-20 size-20 rounded-full bg-orange/6" />
+        </>
+      )}
 
       <div className="relative min-h-[238px]">
         <AnimatePresence mode="wait">
@@ -79,18 +92,26 @@ export function HeroCarousel() {
               <Icon className="size-4" />
               {slide.badge}
             </span>
-            <div className="mt-4 flex items-start justify-between gap-2">
-              <h1 className="font-heading text-[2.2rem] font-extrabold leading-[1.08] text-balance">
+
+            {slide.layout === 'mascot' ? (
+              <div className="mt-4 flex items-start justify-between gap-2">
+                <h1 className="font-heading text-[2.2rem] font-extrabold leading-[1.08] text-balance">
+                  {slide.title}
+                </h1>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.15, duration: 0.35 }}
+                >
+                  <MascotGold size={92} className="-mt-2 shrink-0 drop-shadow-lg" alt="" pose="default" />
+                </motion.div>
+              </div>
+            ) : (
+              <h1 className="mt-4 font-heading text-[2rem] font-extrabold leading-[1.12] text-balance">
                 {slide.title}
               </h1>
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.15, duration: 0.35 }}
-              >
-                <MascotGold size={92} className="-mt-2 shrink-0 drop-shadow-lg" alt="" pose="default" />
-              </motion.div>
-            </div>
+            )}
+
             <p className="mt-3 leading-relaxed text-white/75">{slide.text}</p>
           </motion.div>
         </AnimatePresence>

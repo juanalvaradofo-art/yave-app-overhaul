@@ -33,20 +33,35 @@ const timeline = [
   { id: 'n5', type: 'payment' as NotifType, title: 'Pago registrado', text: 'Recibimos tu cuota de $180.000. Vas al dia, parcero!', time: 'Hace 1 sem', dot: 'bg-navy' },
 ]
 
-export function NotificationBell() {
+export function NotificationBell({ flash }: { flash?: string | null }) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <button
-        type="button"
-        aria-label="Notificaciones"
-        onClick={() => setOpen(true)}
-        className="relative flex size-11 items-center justify-center rounded-full bg-card shadow-sm transition-colors hover:bg-muted"
-      >
-        <Bell className="size-5 text-navy" />
-        <span className="absolute right-2.5 top-2.5 size-2.5 rounded-full bg-orange ring-2 ring-card" />
-      </button>
+      <div className="relative">
+        <button
+          type="button"
+          aria-label="Notificaciones"
+          onClick={() => setOpen(true)}
+          className="relative flex size-11 items-center justify-center rounded-full bg-card shadow-sm transition-colors hover:bg-muted"
+        >
+          <Bell className="size-5 text-navy" />
+          <span className="absolute right-2.5 top-2.5 size-2.5 rounded-full bg-orange ring-2 ring-card" />
+        </button>
+        <AnimatePresence>
+          {flash && (
+            <motion.div
+              initial={{ opacity: 0, y: -4, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4, scale: 0.95 }}
+              className="absolute right-0 top-13 z-50 w-64 rounded-2xl bg-navy p-3 text-xs font-bold text-white shadow-xl"
+            >
+              <div className="absolute -top-1.5 right-4 size-3 rotate-45 bg-navy" />
+              {flash}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <AnimatePresence>
         {open && (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -21,15 +21,69 @@ import {
   TrendingUp,
   PartyPopper,
   X,
+  CalendarDays,
+  Info,
+  ChevronDown,
 } from 'lucide-react'
 import { NotificationBell } from '@/components/notification-bell'
-import { Mascot, RankMascot } from '@/components/mascot'
+import { RankMascot } from '@/components/mascot'
 import { MascotGold } from '@/components/mascot-gold'
 import { ApplicationOverlay } from '@/components/onboarding/application-overlay'
 import { OtpInput } from '@/components/otp-input'
 import { ranks } from '@/lib/yave-data'
 import { useYave } from '@/lib/yave-store'
 import type { CreditStatus } from '@/lib/yave-store'
+
+const RATE_MONTHLY = 0.022
+const FIANZA_PCT = 0.12
+const ADMIN_FEE_PCT = 0.05
+const YAVE_PASS_MONTHLY = 15_000
+
+function cop(n: number) {
+  return '$ ' + Math.round(n).toLocaleString('es-CO')
+}
+
+function getTierRules(rankIndex: number) {
+  if (rankIndex <= 2) {
+    return { freq: 'quincenal' as const, maxPeriods: 4, periodLabel: 'quincenas', freqLabel: 'Quincenal' }
+  }
+  if (rankIndex <= 4) {
+    return { freq: 'mensual' as const, maxPeriods: 3, periodLabel: 'meses', freqLabel: 'Mensual' }
+  }
+  return { freq: 'mensual' as const, maxPeriods: 4, periodLabel: 'meses', freqLabel: 'Mensual' }
+}
+
+function computeCredit(amount: number, periods: number, freq: 'mensual' | 'quincenal') {
+  const months = freq === 'quincenal' ? periods * 0.5 : periods
+  const interest = amount * RATE_MONTHLY * months
+  const fianza = amount * FIANZA_PCT
+  const adminFee = amount * ADMIN_FEE_PCT
+  const yavePass = freq === 'mensual'
+    ? YAVE_PASS_MONTHLY * periods
+    : (YAVE_PASS_MONTHLY / 2) * periods
+  const total = amount + interest + fianza + adminFee + yavePass
+  const perInstallment = total / periods
+  return { interest, fianza, adminFee, yavePass, total, perInstallment, months }
+}
+
+function generateSchedule(periods: number, freq: 'mensual' | 'quincenal', perInstallment: number) {
+  const today = new Date()
+  const schedule: Array<{ date: string; amount: string; num: number }> = []
+  for (let i = 1; i <= periods; i++) {
+    const d = new Date(today)
+    if (freq === 'quincenal') {
+      d.setDate(d.getDate() + i * 15)
+    } else {
+      d.setMonth(d.getMonth() + i)
+    }
+    schedule.push({
+      num: i,
+      date: d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }),
+      amount: cop(perInstallment),
+    })
+  }
+  return schedule
+}
 
 const movements = [
   { title: 'Pago de cuota', date: '12 jun', amount: '-$ 180.000', direction: 'out' as const },
@@ -38,7 +92,7 @@ const movements = [
 ]
 
 export default function InicioPage() {
-  const { userName, hasCupo, setHasCupo, coins, rankIndex, creditStatus, setCreditStatus, requestCupo } = useYave()
+  const { userName, hasCupo, setHasCupo, coins, rankIndex, creditStatus, setCreditStatus, requestCupo, flashNotification, setFlashNotification } = useYave()
   const rank = ranks[rankIndex]
   const [applyOpen, setApplyOpen] = useState(false)
   const [successOpen, setSuccessOpen] = useState(false)
@@ -46,7 +100,22 @@ export default function InicioPage() {
   function handleSign() {
     requestCupo()
     setSuccessOpen(true)
+    setFlashNotification('Tu dinero ya fue transferido a tu cuenta!')
+    if (typeof window !== 'undefined') {
+      import('canvas-confetti').then((mod) => {
+        const fire = mod.default
+        fire({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#FFD600', '#f26522', '#0A2540'] })
+        setTimeout(() => fire({ particleCount: 60, spread: 100, origin: { y: 0.5 } }), 300)
+      })
+    }
   }
+
+  useEffect(() => {
+    if (flashNotification) {
+      const t = setTimeout(() => setFlashNotification(null), 6000)
+      return () => clearTimeout(t)
+    }
+  }, [flashNotification, setFlashNotification])
 
   return (
     <div className="flex flex-col gap-5">
@@ -59,7 +128,7 @@ export default function InicioPage() {
             <p className="font-heading text-lg font-extrabold text-navy">{userName}</p>
           </div>
         </div>
-        <NotificationBell />
+        <NotificationBell flash={flashNotification} />
       </div>
 
       {/* Demo toggle */}
@@ -77,7 +146,7 @@ export default function InicioPage() {
       ) : creditStatus === 'approved' ? (
         <ApprovedState onAccept={() => setCreditStatus('accepted')} rankIndex={rankIndex} />
       ) : creditStatus === 'accepted' ? (
-        <ContractSummary onSign={handleSign} />
+        <ContractSummary onSign={handleSign} rankIndex={rankIndex} />
       ) : (
         <EmptyState rankColor={rank.color} onApply={() => setApplyOpen(true)} />
       )}
@@ -220,30 +289,175 @@ function PendingState() {
 
 function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankIndex: number }) {
   const rank = ranks[rankIndex]
+  const tier = useMemo(() => getTierRules(rankIndex), [rankIndex])
+  const maxAmount = rank.cupoValue
+  const minAmount = 200_000
+  const canMonthly = rankIndex >= 3
+
+  const [amount, setAmount] = useState(maxAmount)
+  const [periods, setPeriods] = useState(Math.min(3, tier.maxPeriods))
+  const [showBreakdown, setShowBreakdown] = useState(false)
+
+  const credit = useMemo(() => computeCredit(amount, periods, tier.freq), [amount, periods, tier.freq])
+  const ratePerPeriod = tier.freq === 'mensual' ? RATE_MONTHLY : RATE_MONTHLY / 2
+
+  const sliderPct = ((amount - minAmount) / (maxAmount - minAmount)) * 100
+  const termPct = tier.maxPeriods > 1 ? ((periods - 1) / (tier.maxPeriods - 1)) * 100 : 100
+
   return (
     <div className="flex flex-col gap-5">
+      {/* Header */}
       <div className="overflow-hidden rounded-[2rem] bg-navy p-6 text-white shadow-lg">
         <div className="flex items-center gap-2 text-yellow">
           <CheckCircle2 className="size-5" />
           <span className="font-heading font-bold">Cupo Aprobado!</span>
         </div>
-        <h2 className="mt-2 font-heading text-2xl font-extrabold">Selecciona tus condiciones</h2>
-        <p className="mt-2 leading-relaxed text-white/70">
-          Tu credito fue aprobado. Elige el monto y plazo que mas te convenga segun tu rango {rank.name}.
+        <h2 className="mt-2 font-heading text-2xl font-extrabold">Personaliza tu credito</h2>
+        <p className="mt-2 text-sm leading-relaxed text-white/70">
+          Selecciona el monto y plazo que mas te convenga. Tu cupo maximo aprobado es {cop(maxAmount)}.
         </p>
+      </div>
 
-        <div className="mt-5 rounded-2xl bg-white/10 p-4">
+      {/* Configuration card */}
+      <div className="rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border">
+        {/* Frequency indicator */}
+        <div className="mb-5 flex items-center gap-3">
+          <div className={`flex-1 rounded-xl p-3 text-center text-sm font-bold ${tier.freq === 'quincenal' ? 'bg-navy text-white' : 'bg-muted text-muted-foreground'}`}>
+            Quincenal
+            {!canMonthly && tier.freq === 'quincenal' && (
+              <span className="ml-1 text-[10px] font-normal text-white/60">(tu rango)</span>
+            )}
+          </div>
+          <div className={`flex-1 rounded-xl p-3 text-center text-sm font-bold ${
+            tier.freq === 'mensual'
+              ? 'bg-navy text-white'
+              : 'cursor-not-allowed bg-muted/50 text-muted-foreground/40'
+          }`}>
+            Mensual
+            {!canMonthly && <Lock className="ml-1 inline size-3" />}
+          </div>
+        </div>
+        {!canMonthly && (
+          <p className="mb-4 -mt-2 text-center text-xs text-muted-foreground">
+            La opcion mensual se desbloquea en rango Platino o superior
+          </p>
+        )}
+
+        {/* Amount slider */}
+        <div className="mb-6">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <Wallet className="size-4 text-navy" />
+              Monto solicitado
+            </span>
+            <span className="font-heading text-xl font-extrabold text-navy">{cop(amount)}</span>
+          </div>
+          <input
+            type="range"
+            min={minAmount}
+            max={maxAmount}
+            step={50_000}
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            className="yave-slider"
+            aria-label="Monto"
+            style={{
+              background: `linear-gradient(to right, var(--navy) 0%, var(--navy) ${sliderPct}%, var(--muted) ${sliderPct}%, var(--muted) 100%)`,
+            }}
+          />
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>{cop(minAmount)}</span>
+            <span>{cop(maxAmount)}</span>
+          </div>
+        </div>
+
+        {/* Term slider */}
+        <div className="mb-6">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <CalendarDays className="size-4 text-navy" />
+              Plazo
+            </span>
+            <span className="font-heading text-lg font-extrabold text-navy">
+              {periods} {tier.periodLabel} · {periods} cuotas
+            </span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={tier.maxPeriods}
+            step={1}
+            value={periods}
+            onChange={(e) => setPeriods(Number(e.target.value))}
+            className="yave-slider"
+            aria-label="Plazo"
+            style={{
+              background: `linear-gradient(to right, var(--navy) 0%, var(--navy) ${termPct}%, var(--muted) ${termPct}%, var(--muted) 100%)`,
+            }}
+          />
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>1</span>
+            <span>{tier.maxPeriods} {tier.periodLabel}</span>
+          </div>
+        </div>
+
+        {/* Live result */}
+        <div className="rounded-2xl bg-navy p-5">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-white/60">Cupo aprobado</span>
-            <span className="font-heading text-2xl font-extrabold text-yellow">{rank.cupo}</span>
+            <span className="text-sm font-semibold text-white/70">
+              Cuota {tier.freq === 'mensual' ? 'mensual' : 'quincenal'}
+            </span>
+            <span className="font-heading text-3xl font-extrabold text-orange">
+              {cop(credit.perInstallment)}
+            </span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-sm">
-            <span className="text-white/60">Modalidad</span>
-            <span className="font-bold text-white">{rank.frecuencia}</span>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-sm">
-            <span className="text-white/60">Tasa</span>
-            <span className="font-bold text-white">2.2% E.M.</span>
+
+          <button
+            type="button"
+            onClick={() => setShowBreakdown((o) => !o)}
+            className="mt-4 flex w-full items-center justify-between border-t border-white/15 pt-3 text-sm font-bold text-white"
+            aria-expanded={showBreakdown}
+          >
+            <span className="flex items-center gap-1.5">
+              <Info className="size-4 text-orange" />
+              Ver desglose de costos
+            </span>
+            <ChevronDown className={`size-4 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} />
+          </button>
+
+          <AnimatePresence initial={false}>
+            {showBreakdown && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="flex flex-col gap-2.5 pt-4 text-sm">
+                  <BreakdownRow label="Monto solicitado" value={cop(amount)} />
+                  <BreakdownRow
+                    label="Intereses"
+                    sub={`${(ratePerPeriod * 100).toFixed(1)}% ${tier.freq === 'mensual' ? 'E.M.' : 'por quincena'}`}
+                    value={cop(credit.interest)}
+                  />
+                  <BreakdownRow label="Fianza (12%)" value={cop(credit.fianza)} />
+                  <BreakdownRow label="Cuota administrativa (5%)" value={cop(credit.adminFee)} />
+                  <BreakdownRow
+                    label="Yave Pass"
+                    sub={tier.freq === 'mensual'
+                      ? `$15.000/mes x ${periods}`
+                      : `$7.500/quincena x ${periods}`
+                    }
+                    value={cop(credit.yavePass)}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="mt-4 flex items-center justify-between border-t border-white/15 pt-3">
+            <span className="font-heading font-bold text-white">Total a pagar</span>
+            <span className="font-heading text-lg font-extrabold text-white">{cop(credit.total)}</span>
           </div>
         </div>
 
@@ -253,16 +467,34 @@ function ApprovedState({ onAccept, rankIndex }: { onAccept: () => void; rankInde
           className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-white shadow-lg shadow-orange/25 transition-all hover:brightness-110 active:translate-y-px"
         >
           <FileSignature className="size-5" />
-          Si, quiero mi cupo
+          Continuar con estas condiciones
         </button>
       </div>
     </div>
   )
 }
 
-function ContractSummary({ onSign }: { onSign: () => void }) {
+function BreakdownRow({ label, sub, value }: { label: string; sub?: string; value: string }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <span className="font-bold text-white">{label}</span>
+        <span className="font-bold text-white">{value}</span>
+      </div>
+      {sub && <p className="text-xs text-white/50">{sub}</p>}
+    </div>
+  )
+}
+
+function ContractSummary({ onSign, rankIndex }: { onSign: () => void; rankIndex: number }) {
   const [otpVal, setOtpVal] = useState('')
   const [showOtp, setShowOtp] = useState(false)
+  const tier = useMemo(() => getTierRules(rankIndex), [rankIndex])
+
+  const amount = 300_000
+  const periods = tier.freq === 'quincenal' ? 4 : 3
+  const credit = useMemo(() => computeCredit(amount, periods, tier.freq), [periods, tier.freq])
+  const schedule = useMemo(() => generateSchedule(periods, tier.freq, credit.perInstallment), [periods, tier.freq, credit.perInstallment])
 
   return (
     <div className="flex flex-col gap-5">
@@ -273,20 +505,39 @@ function ContractSummary({ onSign }: { onSign: () => void }) {
         </div>
 
         <div className="mt-5 flex flex-col gap-3">
-          <ContractRow label="Monto aprobado" value="$ 300.000" />
+          <ContractRow label="Monto aprobado" value={cop(amount)} />
           <ContractRow label="Tasa de interes" value="2.2% E.M." />
-          <ContractRow label="Plazo" value="4 quincenas (2 meses)" />
-          <ContractRow label="Interes total" value="$ 13.200" />
-          <ContractRow icon={ShieldCheck} label="Fianza (12%)" value="$ 36.000" />
-          <ContractRow icon={BadgeDollarSign} label="Cuota administrativa (5%)" value="$ 15.000" />
-          <ContractRow icon={CreditCard} label="Yave Pass" value="$ 15.000" />
+          <ContractRow label="Plazo" value={`${periods} ${tier.periodLabel}`} />
+          <ContractRow label="Interes total" value={cop(credit.interest)} />
+          <ContractRow icon={ShieldCheck} label="Fianza (12%)" value={cop(credit.fianza)} />
+          <ContractRow icon={BadgeDollarSign} label="Cuota administrativa (5%)" value={cop(credit.adminFee)} />
+          <ContractRow icon={CreditCard} label="Yave Pass" value={cop(credit.yavePass)} />
           <div className="border-t border-border pt-3">
-            <ContractRow label="Total a pagar" value="$ 394.200" bold />
+            <ContractRow label="Total a pagar" value={cop(credit.total)} bold />
           </div>
-          <ContractRow label="Cuota quincenal" value="$ 98.550" />
-          <ContractRow label="Fecha primer pago" value="10 jul 2026" />
-          <ContractRow label="Fecha ultimo pago" value="25 ago 2026" />
-          <ContractRow label="Reporta a centrales" value="Si - DataCredito" />
+          <ContractRow label={`Cuota ${tier.freq === 'mensual' ? 'mensual' : 'quincenal'}`} value={cop(credit.perInstallment)} />
+          <ContractRow label="Reporta a centrales" value="Si - Centrales de riesgo" />
+        </div>
+
+        {/* Installment schedule */}
+        <div className="mt-5">
+          <h3 className="mb-3 flex items-center gap-1.5 font-heading text-sm font-extrabold text-navy">
+            <CalendarDays className="size-4" />
+            Calendario de cuotas
+          </h3>
+          <div className="flex flex-col gap-2">
+            {schedule.map((s) => (
+              <div key={s.num} className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-2.5 text-sm">
+                <span className="text-muted-foreground">
+                  <span className="mr-2 inline-flex size-5 items-center justify-center rounded-full bg-navy text-[10px] font-bold text-white">
+                    {s.num}
+                  </span>
+                  {s.date}
+                </span>
+                <span className="font-bold text-navy">{s.amount}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-5 rounded-2xl bg-muted p-4 text-xs leading-relaxed text-muted-foreground">
@@ -296,7 +547,7 @@ function ContractSummary({ onSign }: { onSign: () => void }) {
               Al firmar, aceptas los Terminos y Condiciones, la Politica de Privacidad
               y autorizas el tratamiento de datos conforme a Habeas Data de Yave S.A.S.
               Tasa sujeta a la tasa de usura vigente. Vigilados por la Superintendencia
-              Financiera de Colombia. Se reportara a centrales de riesgo (DataCredito/TransUnion).
+              Financiera de Colombia. Se reportara a centrales de riesgo.
             </p>
           </div>
         </div>
@@ -313,7 +564,7 @@ function ContractSummary({ onSign }: { onSign: () => void }) {
             className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-white shadow-lg shadow-orange/25 transition-all hover:brightness-110 active:translate-y-px"
           >
             <FileSignature className="size-5" />
-            Firmar contrato
+            Firmar por OTP
           </motion.button>
         ) : (
           <motion.div
@@ -398,14 +649,14 @@ function SuccessModal({ open, onClose }: { open: boolean; onClose: () => void })
             >
               <div className="mt-4 flex items-center justify-center gap-2 text-orange">
                 <PartyPopper className="size-5" />
-                <span className="font-heading font-bold">Felicitaciones!</span>
+                <span className="font-heading font-bold">Contrato firmado!</span>
               </div>
               <h2 className="mt-2 font-heading text-2xl font-extrabold text-navy">
-                Tu credito fue aprobado
+                Felicitaciones!
               </h2>
               <p className="mt-3 leading-relaxed text-muted-foreground">
-                A tu correo llegaran los documentos de tu credito.
-                En las proximas horas recibiras tu desembolso.
+                Tu dinero ya fue transferido a tu cuenta.
+                En minutos lo veras reflejado en tu saldo.
               </p>
               <button
                 type="button"
@@ -456,7 +707,7 @@ function EmptyState({ rankColor, onApply }: { rankColor: string; onApply: () => 
       </div>
 
       <div className="flex items-center gap-4 rounded-[1.75rem] p-5" style={{ backgroundColor: `${rankColor}1f` }}>
-        <Mascot size={64} alt="" className="shrink-0" />
+        <MascotGold size={64} alt="" className="shrink-0" />
         <div>
           <p className="font-heading font-bold text-navy">Estoy listo para ayudarte</p>
           <p className="text-sm leading-relaxed text-muted-foreground">

@@ -19,14 +19,13 @@ import { ranks } from '@/lib/yave-data'
 const RATE_MONTHLY = 0.022
 const FIANZA_PCT = 0.12
 const ADMIN_FEE_PCT = 0.05
-const YAVE_PASS_FEE = 15_000
+const YAVE_PASS_MONTHLY = 15_000
 
 function cop(n: number) {
   return '$ ' + Math.round(n).toLocaleString('es-CO')
 }
 
 function getTierRules(rankIndex: number) {
-  const r = ranks[rankIndex]
   if (rankIndex <= 2) {
     return { freq: 'quincenal' as const, maxPeriods: 4, periodLabel: 'quincenas', freqLabel: 'Quincenal' }
   }
@@ -50,7 +49,10 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
   const interest = amount * RATE_MONTHLY * months
   const fianza = amount * FIANZA_PCT
   const adminFee = amount * ADMIN_FEE_PCT
-  const total = amount + interest + fianza + adminFee + YAVE_PASS_FEE
+  const yavePass = tier.freq === 'mensual'
+    ? YAVE_PASS_MONTHLY * periods
+    : (YAVE_PASS_MONTHLY / 2) * periods
+  const total = amount + interest + fianza + adminFee + yavePass
   const perInstallment = total / installments
   const ratePerPeriod = tier.freq === 'mensual' ? RATE_MONTHLY : RATE_MONTHLY / 2
 
@@ -60,7 +62,7 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
   const rank = ranks[rankIndex]
 
   return (
-    <div className="rounded-[2rem] bg-card p-6 shadow-lg ring-1 ring-border">
+    <div className="rounded-[2rem] bg-card p-6 shadow-sm ring-1 ring-border">
       <div className="mb-6 flex items-center justify-between gap-3">
         <h3 className="font-heading text-xl font-extrabold text-navy">
           Simula tu credito
@@ -209,8 +211,11 @@ export function CreditSimulator({ rankIndex = 0 }: { rankIndex?: number }) {
                   icon={CreditCard}
                   iconBg="bg-yellow/20"
                   label="Yave Pass"
-                  sublabel="Acceso a beneficios"
-                  value={cop(YAVE_PASS_FEE)}
+                  sublabel={tier.freq === 'mensual'
+                    ? `$15.000/mes x ${periods} meses`
+                    : `$7.500/quincena x ${periods} quincenas`
+                  }
+                  value={cop(yavePass)}
                 />
               </div>
             </motion.dl>

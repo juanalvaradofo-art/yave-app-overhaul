@@ -31,9 +31,11 @@ type YaveState = {
   rankUpTo: number | null
   rankDownTo: number | null
   creditStatus: CreditStatus
+  flashNotification: string | null
   setHasCupo: (v: boolean) => void
   requestCupo: () => void
   setCreditStatus: (s: CreditStatus) => void
+  setFlashNotification: (msg: string | null) => void
   registerPayment: (type: PaymentType, moraDays?: number) => void
   redeem: (cost: number, label: string) => void
   clearRankUp: () => void
@@ -67,6 +69,7 @@ export function YaveProvider({ children }: { children: ReactNode }) {
   const [rankUpTo, setRankUpTo] = useState<number | null>(null)
   const [rankDownTo, setRankDownTo] = useState<number | null>(null)
   const [creditStatus, setCreditStatus] = useState<CreditStatus>('none')
+  const [flashNotification, setFlashNotification] = useState<string | null>(null)
   const [logs, setLogs] = useState<LogEntry[]>([
     { id: id(), kind: 'coins', label: 'Pago a tiempo · 12 jun', delta: 200, date: '12 jun' },
     { id: id(), kind: 'xp', label: 'Pago a tiempo · 12 jun', delta: 100, date: '12 jun' },
@@ -138,15 +141,17 @@ export function YaveProvider({ children }: { children: ReactNode }) {
       rankUpTo,
       rankDownTo,
       creditStatus,
+      flashNotification,
       setHasCupo,
       requestCupo,
       setCreditStatus,
+      setFlashNotification,
       registerPayment,
       redeem,
       clearRankUp,
       clearRankDown,
     }),
-    [hasCupo, xp, coins, rankIndex, logs, rankUpTo, rankDownTo, creditStatus, requestCupo, registerPayment, redeem, clearRankUp, clearRankDown],
+    [hasCupo, xp, coins, rankIndex, logs, rankUpTo, rankDownTo, creditStatus, flashNotification, requestCupo, registerPayment, redeem, clearRankUp, clearRankDown],
   )
 
   return <YaveContext.Provider value={value}>{children}</YaveContext.Provider>
