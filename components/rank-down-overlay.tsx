@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { TrendingDown } from 'lucide-react'
-import { RankMascot } from '@/components/mascot'
+import { RankMascot } from '@/components/mascot-gold'
 import { ranks } from '@/lib/yave-data'
 import { useYave } from '@/lib/yave-store'
 

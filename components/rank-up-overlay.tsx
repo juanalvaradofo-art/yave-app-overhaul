@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { AnimatePresence, motion } from 'framer-motion'
 import { KeyRound } from 'lucide-react'
-import { RankMascot } from '@/components/mascot'
+import { RankMascot } from '@/components/mascot-gold'
 import { ranks } from '@/lib/yave-data'
 import { useYave } from '@/lib/yave-store'
 

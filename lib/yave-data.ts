@@ -77,6 +77,24 @@ export const testimonials = [
     text: 'Un día se me complicó pagar y me ayudaron sin regañarme. De verdad lo tratan a uno como parcero.',
     rating: 5,
   },
+  {
+    name: 'Juan M.',
+    city: 'Barranquilla',
+    text: 'La app es super facil de usar. Pido mi credito desde el celular y en minutos tengo la plata. No hay excusa.',
+    rating: 5,
+  },
+  {
+    name: 'Laura V.',
+    city: 'Cartagena',
+    text: 'Mi primer credito fue de $300.000 y ahora ya tengo cupo de $600.000. Pagar a tiempo siempre vale la pena.',
+    rating: 5,
+  },
+  {
+    name: 'Carlos T.',
+    city: 'Pereira',
+    text: 'Me encanta que sean transparentes con los costos. Antes de aceptar, ya se exactamente cuanto voy a pagar.',
+    rating: 5,
+  },
 ]
 
 export type YaveNotification = {

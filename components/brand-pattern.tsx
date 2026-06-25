@@ -4,22 +4,21 @@
  * Rendered as a fixed layer behind all content.
  */
 const PHRASES = [
-  '¡Quiubo, parcero!',
-  'con cariño',
+  'Confianza',
+  'Tu meta',
+  'Responsabilidad',
+  "Pa' lante",
+  'Hecho en Colombia',
+  'Tecnologia',
+  'Credito humano',
   'Yave',
-  'berraquera',
-  'a tu lado',
-  '¡Hágale pues!',
-  'plata al instante',
-  'tu llave amiga',
-  '¡Bacano!',
-  'sin letra pequeña',
-  'pa’ lante',
-  'crédito humano',
-  '¡Eso sí!',
+  'Sin letra pequena',
+  'Berraquera',
+  'A tu lado',
   'Yave Coins',
-  '¡Qué chimba!',
-  'confianza',
+  'Tu llave amiga',
+  'Bacano',
+  'Quiubo, parcero',
 ]
 
 function buildTile() {
@@ -31,7 +30,7 @@ function buildTile() {
     const offset = (r % 2) * 70
     const phrase = PHRASES[(r * 2) % PHRASES.length]
     const phrase2 = PHRASES[(r * 2 + 1) % PHRASES.length]
-    texts += `<text x="${offset}" y="${y}" font-family="Poppins, sans-serif" font-size="22" font-weight="700" fill="#2438a0">${phrase} · ${phrase2}</text>`
+    texts += `<text x="${offset}" y="${y}" font-family="Poppins, sans-serif" font-size="22" font-weight="700" fill="#0a1628">${phrase} &middot; ${phrase2}</text>`
   }
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="560" height="420" viewBox="0 0 560 420"><g transform="rotate(-12 280 210)">${texts}</g></svg>`
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
@@ -41,7 +40,7 @@ export function BrandPattern() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 opacity-[0.04]"
+      className="pointer-events-none fixed inset-0 z-0 opacity-[0.06]"
       style={{
         backgroundImage: buildTile(),
         backgroundRepeat: 'repeat',

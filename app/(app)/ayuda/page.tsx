@@ -16,7 +16,7 @@ export default function AyudaPage() {
           ¿Necesitas hablar con alguien?
         </h2>
         <p className="mt-2 leading-relaxed text-white/80">
-          Nuestro equipo humano te responde de lunes a sábado.
+          Nuestro equipo humano te responde de lunes a sabado.
         </p>
         <a
           href="https://wa.me/573000000000"

@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, HandCoins, Headphones, Sparkles } from 'lucide-react'
-import { Mascot } from '@/components/mascot'
+import { ArrowRight, HandCoins, Headphones, Sparkles, ShieldCheck, Users } from 'lucide-react'
+import { MascotGold } from '@/components/mascot-gold'
 
 const slides = [
   {
-    badge: 'Micro-créditos con corazón',
+    badge: 'Micro-creditos con corazon',
     icon: HandCoins,
-    title: 'El crédito que te entiende',
+    title: 'El credito que te entiende',
     text: 'Pocos requisitos, respuesta en minutos y recompensas en cada pago. Pide tu plata sin enredos.',
     cta: 'Solicitar mi plata',
   },
@@ -18,15 +18,29 @@ const slides = [
     badge: 'Siempre con un humano',
     icon: Headphones,
     title: 'Te atiende gente, no robots',
-    text: 'Líneas de atención de lunes a sábado. Hablas con un parcero de verdad cuando lo necesitas.',
+    text: 'Lineas de atencion de lunes a sabado. Hablas con un parcero de verdad cuando lo necesitas.',
     cta: 'Hablar con Yave',
   },
   {
     badge: 'Gana mientras pagas',
     icon: Sparkles,
     title: 'Cada pago suma Yave Coins',
-    text: 'Sube de llave, desbloquea La Bóveda y canjea tus monedas por beneficios reales.',
+    text: 'Sube de llave, desbloquea La Boveda y canjea tus monedas por beneficios reales.',
     cta: 'Conocer recompensas',
+  },
+  {
+    badge: 'Seguridad bancaria',
+    icon: ShieldCheck,
+    title: 'Tus datos protegidos',
+    text: 'Cifrado de nivel bancario y vigilancia de la Superintendencia Financiera de Colombia.',
+    cta: 'Saber mas',
+  },
+  {
+    badge: 'Comunidad Yave',
+    icon: Users,
+    title: 'Mas de 250.000 parceros',
+    text: 'Unidos por un credito justo, transparente y hecho en Colombia.',
+    cta: 'Unirme ahora',
   },
 ]
 
@@ -50,7 +64,7 @@ export function HeroCarousel() {
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -24 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
+            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow px-3 py-1.5 text-xs font-bold text-yellow-foreground">
               <Icon className="size-4" />
@@ -60,7 +74,13 @@ export function HeroCarousel() {
               <h1 className="font-heading text-[2.2rem] font-extrabold leading-[1.08] text-balance">
                 {slide.title}
               </h1>
-              <Mascot size={92} className="-mt-2 shrink-0 drop-shadow-lg" alt="" />
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.15, duration: 0.35 }}
+              >
+                <MascotGold size={92} className="-mt-2 shrink-0 drop-shadow-lg" alt="" pose="default" />
+              </motion.div>
             </div>
             <p className="mt-3 leading-relaxed text-white/75">{slide.text}</p>
           </motion.div>

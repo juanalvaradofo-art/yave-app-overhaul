@@ -2,26 +2,27 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  CloudUpload,
-  FileText,
-  Loader2,
-  Mail,
-  ScanFace,
-  Smartphone,
-  Wallet,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, CloudUpload, FileText, Loader as Loader2, Mail, ScanFace, Smartphone, Wallet, ChevronDown, Sparkles, Target, ShieldCheck, TrendingUp } from 'lucide-react'
 import { YaveLogo } from '@/components/yave-logo'
-import { Mascot } from '@/components/mascot'
+import { MascotGold } from '@/components/mascot-gold'
 import { OtpInput } from '@/components/otp-input'
 
 type Mode = 'signup' | 'application'
 
 const SIGNUP_STEPS = ['Registro', 'Verificación'] as const
-const APPLICATION_STEPS = ['Solicitud', 'Documentos', 'Identidad', 'Firma'] as const
+const APPLICATION_STEPS = ['Solicitud', 'Proposito', 'Documentos', 'Identidad', 'Firma'] as const
+
+const PURPOSE_OPTIONS = [
+  'Consumo',
+  'Tecnología',
+  'Imprevistos',
+  'Negocio',
+  'Comida',
+  'Educación',
+  'Salud',
+  'Viaje',
+  'Otro',
+] as const
 
 const fieldClass =
   'h-13 w-full rounded-2xl border-2 border-border bg-card px-4 py-3 text-navy outline-none transition-colors placeholder:text-muted-foreground focus:border-orange'
@@ -101,7 +102,7 @@ export function OnboardingFlow({
             {mode === 'signup' && step === 1 && (
               <OtpStep
                 title="Verifica tu correo"
-                desc="Te enviamos un código de 6 dígitos a tu email. Escríbelo para crear tu cuenta."
+                desc="Te enviamos un codigo de 6 digitos a tu email. Escribelo para crear tu cuenta."
                 value={otp}
                 onChange={setOtp}
                 onNext={finishSignup}
@@ -110,12 +111,13 @@ export function OnboardingFlow({
             )}
 
             {mode === 'application' && step === 0 && <ApplicationStep onNext={next} />}
-            {mode === 'application' && step === 1 && <DocumentsStep onNext={next} />}
-            {mode === 'application' && step === 2 && <IdentityStep onNext={next} />}
-            {mode === 'application' && step === 3 && (
+            {mode === 'application' && step === 1 && <PropositoStep onNext={next} />}
+            {mode === 'application' && step === 2 && <DocumentsStep onNext={next} />}
+            {mode === 'application' && step === 3 && <IdentityStep onNext={next} />}
+            {mode === 'application' && step === 4 && (
               <OtpStep
-                title="Firma con tu código"
-                desc="Esta firma digital confirma tu solicitud. Ingresa el código que te enviamos por SMS."
+                title="Firma con tu codigo"
+                desc="Esta firma digital confirma tu solicitud. Ingresa el codigo que te enviamos por SMS."
                 value={signOtp}
                 onChange={setSignOtp}
                 onNext={finishApplication}
@@ -163,7 +165,7 @@ function RegisterStep({ onNext }: { onNext: () => void }) {
     <div>
       <StepTitle
         title="Creemos tu cuenta"
-        desc="Empecemos con lo básico. Esto toma menos de un minuto, parcero."
+        desc="Empecemos con lo basico. Esto toma menos de un minuto."
       />
 
       <button
@@ -176,13 +178,13 @@ function RegisterStep({ onNext }: { onNext: () => void }) {
       </button>
 
       <div className="my-5 flex items-center gap-3 text-sm text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />o regístrate con tu correo
+        <span className="h-px flex-1 bg-border" />o registrate con tu correo
         <span className="h-px flex-1 bg-border" />
       </div>
 
       <div className="flex flex-col gap-3">
         <input className={fieldClass} placeholder="Nombre completo" />
-        <input className={fieldClass} type="email" placeholder="Correo electrónico" />
+        <input className={fieldClass} type="email" placeholder="Correo electronico" />
         <input className={fieldClass} type="tel" placeholder="Celular" />
         <label className="text-sm font-semibold text-navy">
           Fecha de nacimiento
@@ -221,7 +223,7 @@ function OtpStep({
       <StepTitle title={title} desc={desc} />
       <OtpInput value={value} onChange={onChange} />
       <button type="button" className="mt-4 text-sm font-bold text-orange">
-        Reenviar código
+        Reenviar codigo
       </button>
       <PrimaryButton onClick={onNext}>{cta}</PrimaryButton>
     </div>
@@ -232,13 +234,13 @@ function ApplicationStep({ onNext }: { onNext: () => void }) {
   return (
     <div>
       <StepTitle
-        title="Cuéntanos de ti"
+        title="Cuentanos de ti"
         desc="Con esto entendemos tu momento para darte el mejor cupo."
       />
       <div className="flex flex-col gap-3">
-        <input className={fieldClass} placeholder="Ocupación" />
+        <input className={fieldClass} placeholder="Ocupacion" />
         <input className={fieldClass} placeholder="Ingresos mensuales aprox." />
-        <input className={fieldClass} placeholder="Dirección de residencia" />
+        <input className={fieldClass} placeholder="Direccion de residencia" />
         <input className={fieldClass} placeholder="Ciudad" />
         <div className="rounded-2xl bg-muted p-4">
           <p className="font-heading font-bold text-navy">Contacto de referencia</p>
@@ -256,10 +258,109 @@ function ApplicationStep({ onNext }: { onNext: () => void }) {
   )
 }
 
+function PropositoStep({ onNext }: { onNext: () => void }) {
+  const [purpose, setPurpose] = useState('')
+  const [openDropdown, setOpenDropdown] = useState(false)
+
+  return (
+    <div>
+      <StepTitle
+        title="Para que necesitas el dinero?"
+        desc="Esto nos ayuda a entender tu situacion y ofrecerte el mejor plan."
+      />
+
+      <div className="flex flex-col gap-4">
+        {/* Purpose dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setOpenDropdown(!openDropdown)}
+            className="flex h-13 w-full items-center justify-between rounded-2xl border-2 border-border bg-card px-4 text-navy outline-none transition-colors focus:border-orange"
+          >
+            <span className={purpose ? 'font-semibold text-navy' : 'text-muted-foreground'}>
+              {purpose || 'Selecciona una opcion'}
+            </span>
+            <ChevronDown
+              className={`size-5 text-muted-foreground transition-transform ${openDropdown ? 'rotate-180' : ''}`}
+            />
+          </button>
+          <AnimatePresence>
+            {openDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.15 }}
+                className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
+              >
+                {PURPOSE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      setPurpose(opt)
+                      setOpenDropdown(false)
+                    }}
+                    className="flex h-12 w-full items-center px-4 text-left text-sm font-semibold text-navy transition-colors hover:bg-muted"
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Why Yave info card */}
+        <div className="rounded-2xl border-2 border-border bg-card p-5">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-5 text-orange" />
+            <h3 className="font-heading text-lg font-bold text-navy">
+              Por que Yave?
+            </h3>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Nuestro modelo de credito alternativo analiza tu comportamiento de pago
+            en tiempo real. No dependemos solo del buró de credito tradicional.
+          </p>
+          <ul className="mt-3 flex flex-col gap-2.5">
+            <li className="flex items-start gap-2.5 text-sm">
+              <TrendingUp className="mt-0.5 size-4 shrink-0 text-orange" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-navy">Analisis conductual:</span>{' '}
+                Evaluamos como pagas, no solo tu historial pasado.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5 text-sm">
+              <Target className="mt-0.5 size-4 shrink-0 text-orange" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-navy">Recompensas reales:</span>{' '}
+                Ganas Yave Coins y subes de llave con cada pago a tiempo.
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5 text-sm">
+              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-orange" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-navy">Sin letra pequena:</span>{' '}
+                Costos transparentes desde el primer momento.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <PrimaryButton onClick={onNext}>
+        Continuar
+        <ArrowRight className="size-5" />
+      </PrimaryButton>
+    </div>
+  )
+}
+
 const docs = [
-  { icon: FileText, label: 'Extracto bancario', hint: 'Últimos 3 meses' },
+  { icon: FileText, label: 'Extracto bancario', hint: 'Ultimos 3 meses' },
   { icon: Smartphone, label: 'Pantallazo Nequi / Daviplata', hint: 'Movimientos recientes' },
-  { icon: Wallet, label: 'Factura de servicios', hint: 'Para validar tu dirección' },
+  { icon: Wallet, label: 'Factura de servicios', hint: 'Para validar tu direccion' },
 ]
 
 function DocumentsStep({ onNext }: { onNext: () => void }) {
@@ -269,7 +370,7 @@ function DocumentsStep({ onNext }: { onNext: () => void }) {
     <div>
       <StepTitle
         title="Sube tus documentos"
-        desc="Adjunta imágenes o PDF. Esto nos ayuda a aprobarte más cupo."
+        desc="Adjunta imagenes o PDF. Esto nos ayuda a aprobarte mas cupo."
       />
       <div className="flex flex-col gap-3">
         {docs.map((d, i) => {
@@ -315,8 +416,8 @@ function IdentityStep({ onNext }: { onNext: () => void }) {
   return (
     <div>
       <StepTitle
-        title="Validemos que eres tú"
-        desc="Una foto rápida de tu rostro y tu documento. Solo unos segundos."
+        title="Validemos que eres tu"
+        desc="Una foto rapida de tu rostro y tu documento. Solo unos segundos."
       />
       <div className="flex flex-col items-center rounded-3xl bg-navy p-8 text-navy-foreground">
         <motion.span
@@ -334,7 +435,7 @@ function IdentityStep({ onNext }: { onNext: () => void }) {
         <p className="mt-5 text-center leading-relaxed text-white/75">
           {captured
             ? 'Identidad capturada correctamente'
-            : 'Centra tu rostro en el marco y mantén buena luz.'}
+            : 'Centra tu rostro en el marco y manten buena luz.'}
         </p>
       </div>
       {!captured ? (
@@ -356,18 +457,18 @@ function StudyingScreen() {
         animate={{ y: [0, -12, 0] }}
         transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
       >
-        <Mascot size={160} alt="" />
+        <MascotGold size={160} alt="" />
       </motion.div>
       <div className="mt-6 flex items-center gap-2 text-orange">
         <Loader2 className="size-5 animate-spin" />
-        <span className="font-heading font-bold">Estudiando tu cupo…</span>
+        <span className="font-heading font-bold">Estudiando tu cupo...</span>
       </div>
       <h1 className="mt-4 font-heading text-3xl font-extrabold text-balance text-navy">
         Estamos revisando tu solicitud
       </h1>
       <p className="mt-3 leading-relaxed text-muted-foreground">
-        Dame un momentico, parcero. Estoy calculando el mejor cupo para ti. Te
-        avisamos apenas esté listo.
+        Dame un momentico. Estoy calculando el mejor cupo para ti. Te
+        avisamos apenas este listo.
       </p>
     </div>
   )

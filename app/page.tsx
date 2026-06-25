@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight, Zap, Heart, Sparkles, LifeBuoy } from 'lucide-react'
 import { YaveLogo } from '@/components/yave-logo'
-import { Mascot } from '@/components/mascot'
+import { MascotGold } from '@/components/mascot-gold'
+import { RegulatoryFooter } from '@/components/regulatory-footer'
 import { HeroCarousel } from '@/components/hero-carousel'
 import { CreditSimulator } from '@/components/credit-simulator'
 import { Testimonials } from '@/components/testimonials'
@@ -130,7 +131,7 @@ export default function LandingPage() {
                 <ArrowRight className="size-4" />
               </Link>
             </div>
-            <Mascot size={150} className="absolute -bottom-2 -right-2" alt="" />
+            <MascotGold size={150} className="absolute -bottom-2 -right-2" alt="" pose="default" />
           </div>
         </section>
 

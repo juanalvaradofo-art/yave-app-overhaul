@@ -58,7 +58,7 @@ export function CreditSimulator() {
       label: 'Yave te respalda',
       value: 'Lo cubre Yave',
       strike: cop(fianza),
-      note: `Es el respaldo (fianza) de tu crédito. No lo pagas tú: lo asume Yave y no se suma a tu total.`,
+      note: 'Es el respaldo (fianza) de tu crédito. No lo pagas tú: lo asume Yave como beneficio comercial y no se suma a tu total.',
       tone: 'green' as const,
     },
     {

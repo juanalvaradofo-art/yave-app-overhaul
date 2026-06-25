@@ -57,37 +57,35 @@
 
 :root {
   color-scheme: light;
-  /* Fresher, warmer, more welcoming surface — keeps the navy/orange/yellow brand. */
-  --background: #fbf8f1;
-  --foreground: #1b2a6b;
+  --background: #f8f9fa;
+  --foreground: #0a1628;
   --card: #ffffff;
-  --card-foreground: #1b2a6b;
+  --card-foreground: #0a1628;
   --popover: #ffffff;
-  --popover-foreground: #1b2a6b;
-  --primary: #f7531f;
+  --popover-foreground: #0a1628;
+  --primary: #f26522;
   --primary-foreground: #ffffff;
-  --secondary: #243a93;
+  --secondary: #0a1628;
   --secondary-foreground: #ffffff;
-  --muted: #f2ede2;
-  --muted-foreground: #6f7488;
-  --accent: #ffc20e;
-  --accent-foreground: #1b2a6b;
+  --muted: #eef1f5;
+  --muted-foreground: #6b7280;
+  --accent: #d4a843;
+  --accent-foreground: #0a1628;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #ece5d6;
-  --input: #ece5d6;
-  --ring: #f7531f;
-  /* Brand navy lightened slightly so dark panels feel friendly, not heavy. */
-  --navy: #243a93;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #f26522;
+  --navy: #0a1628;
   --navy-foreground: #ffffff;
-  --orange: #f7531f;
+  --orange: #f26522;
   --orange-foreground: #ffffff;
-  --yellow: #ffc20e;
-  --yellow-foreground: #1b2a6b;
+  --yellow: #d4a843;
+  --yellow-foreground: #0a1628;
   --bronze: #b5742a;
-  --chart-1: #f7531f;
-  --chart-2: #243a93;
-  --chart-3: #ffc20e;
-  --chart-4: #6f7488;
+  --chart-1: #f26522;
+  --chart-2: #0a1628;
+  --chart-3: #d4a843;
+  --chart-4: #6b7280;
   --chart-5: #b5742a;
   --radius: 1rem;
   --sidebar: oklch(0.985 0 0);

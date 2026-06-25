@@ -2,26 +2,40 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import {
-  KeyRound,
-  CheckCircle2,
-  Sparkles,
-  Lock,
-  Zap,
-  CalendarCheck,
-  Clock,
-  ArrowRight,
-  TrendingUp,
-} from 'lucide-react'
-import { RankMascot } from '@/components/mascot'
+import { KeyRound, CircleCheck as CheckCircle2, Sparkles, Lock, Zap, CalendarCheck, Clock, ArrowRight, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
+import { RankMascot } from '@/components/mascot-gold'
 import { TransactionLog } from '@/components/transaction-log'
 import { PaymentSheet } from '@/components/payment-sheet'
+import { MascotGold } from '@/components/mascot-gold'
 import { ranks, xpRules } from '@/lib/yave-data'
 import { useYave } from '@/lib/yave-store'
 
 export default function LlavesPage() {
-  const { xp, coins, rankIndex } = useYave()
+  const { xp, coins, rankIndex, hasCupo } = useYave()
   const [payOpen, setPayOpen] = useState(false)
+
+  if (!hasCupo) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div>
+          <h1 className="flex items-center gap-2 font-heading text-3xl font-extrabold text-navy">
+            <Sparkles className="size-7 text-orange" strokeWidth={2.5} />
+            Programa de Llaves
+          </h1>
+          <p className="mt-1 leading-relaxed text-muted-foreground">
+            Acumula XP pagando a tiempo y sube de llave para desbloquear mejores
+            beneficios.
+          </p>
+        </div>
+
+        <LockedState
+          title="Activa tu cupo para desbloquear el Programa de Llaves"
+          description="Sube de llave pagando a tiempo. Cada llave desbloquea mejor cupo, mejores plazos y beneficios exclusivos."
+        />
+      </div>
+    )
+  }
 
   const current = ranks[rankIndex]
   const next = ranks[rankIndex + 1] ?? null
@@ -86,7 +100,7 @@ export default function LlavesPage() {
           </>
         ) : (
           <p className="mt-4 rounded-2xl bg-orange/10 p-3 text-sm font-semibold text-orange">
-            ¡Llegaste al Olimpo! Eres llave Maestra, el rango máximo.
+            ¡Llegaste al Olimpo! Eres llave Maestra, el rango maximo.
           </p>
         )}
 
@@ -109,7 +123,7 @@ export default function LlavesPage() {
         <div className="rounded-[2rem] border-2 border-dashed border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold text-muted-foreground">
-              Próxima llave
+              Proxima llave
             </span>
             <span
               className="flex size-10 items-center justify-center rounded-full"
@@ -125,7 +139,6 @@ export default function LlavesPage() {
             {next.name}
           </p>
 
-          {/* Cupo increase example — we show the jump, never the total */}
           {cupoIncrease > 0 ? (
             <div
               className="mt-3 flex items-center gap-2 rounded-2xl px-4 py-3"
@@ -138,7 +151,6 @@ export default function LlavesPage() {
             </div>
           ) : null}
 
-          {/* Concrete perks unlocked at the next rank */}
           <p className="mt-4 text-sm font-bold text-muted-foreground">
             Lo que desbloqueas
           </p>
@@ -183,7 +195,7 @@ export default function LlavesPage() {
       {/* XP mechanics */}
       <div>
         <h2 className="mb-3 font-heading text-2xl font-extrabold text-navy">
-          ¿Cómo ganas XP?
+          ¿Como ganas XP?
         </h2>
         <div className="flex flex-col gap-3">
           <MechanicRow
@@ -202,7 +214,7 @@ export default function LlavesPage() {
             icon={Clock}
             tone="danger"
             title="Mora (pago tarde)"
-            reward={`${xpRules.moraPerDay.xp} XP · ${xpRules.moraPerDay.coins} coins / día`}
+            reward={`${xpRules.moraPerDay.xp} XP · ${xpRules.moraPerDay.coins} coins / dia`}
           />
         </div>
         <p className="mt-2 px-1 text-xs leading-relaxed text-muted-foreground">
@@ -234,6 +246,38 @@ export default function LlavesPage() {
       </div>
 
       <PaymentSheet open={payOpen} onClose={() => setPayOpen(false)} />
+    </div>
+  )
+}
+
+function LockedState({
+  title,
+  description,
+}: {
+  title: string
+  description: string
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-[2rem] border-2 border-dashed border-border bg-muted/60 p-8 text-center">
+      <div className="flex flex-col items-center gap-4">
+        <span className="flex size-20 items-center justify-center rounded-full bg-card text-muted-foreground shadow-sm">
+          <Lock className="size-10" strokeWidth={2} />
+        </span>
+        <h2 className="font-heading text-xl font-extrabold text-navy">{title}</h2>
+        <p className="max-w-xs leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+        <Link
+          href="/onboarding"
+          className="mt-2 flex h-13 items-center justify-center gap-2 rounded-2xl bg-orange px-8 font-heading font-bold text-orange-foreground transition-transform active:translate-y-px"
+        >
+          Solicitar mi cupo
+          <ArrowRight className="size-5" />
+        </Link>
+      </div>
+      <div className="mt-6 flex justify-center">
+        <MascotGold size={100} alt="" pose="default" />
+      </div>
     </div>
   )
 }
