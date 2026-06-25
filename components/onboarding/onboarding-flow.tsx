@@ -2,23 +2,23 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, CloudUpload, FileText, Loader as Loader2, Mail, ScanFace, Smartphone, Wallet, ChevronDown, Sparkles, Target, ShieldCheck, TrendingUp } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Check, CloudUpload, FileText, Loader as Loader2, Mail, ScanFace, Smartphone, Wallet, ChevronDown, Sparkles, Target, ShieldCheck, TrendingUp } from 'lucide-react'
 import { YaveLogo } from '@/components/yave-logo'
 import { MascotGold } from '@/components/mascot-gold'
 import { OtpInput } from '@/components/otp-input'
 
 type Mode = 'signup' | 'application'
 
-const SIGNUP_STEPS = ['Registro', 'Verificación'] as const
+const SIGNUP_STEPS = ['Registro', 'Verificacion'] as const
 const APPLICATION_STEPS = ['Solicitud', 'Proposito', 'Documentos', 'Identidad', 'Firma'] as const
 
 const PURPOSE_OPTIONS = [
   'Consumo',
-  'Tecnología',
+  'Tecnologia',
   'Imprevistos',
   'Negocio',
   'Comida',
-  'Educación',
+  'Educacion',
   'Salud',
   'Viaje',
   'Otro',
@@ -153,7 +153,7 @@ function PrimaryButton({
     <button
       type="button"
       onClick={onClick}
-      className="mt-7 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-orange-foreground transition-transform active:translate-y-px"
+      className="mt-7 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-white transition-transform active:translate-y-px"
     >
       {children}
     </button>
@@ -270,7 +270,6 @@ function PropositoStep({ onNext }: { onNext: () => void }) {
       />
 
       <div className="flex flex-col gap-4">
-        {/* Purpose dropdown */}
         <div className="relative">
           <button
             type="button"
@@ -311,7 +310,6 @@ function PropositoStep({ onNext }: { onNext: () => void }) {
           </AnimatePresence>
         </div>
 
-        {/* Why Yave info card */}
         <div className="rounded-2xl border-2 border-border bg-card p-5">
           <div className="flex items-center gap-2">
             <Sparkles className="size-5 text-orange" />
@@ -321,7 +319,7 @@ function PropositoStep({ onNext }: { onNext: () => void }) {
           </div>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Nuestro modelo de credito alternativo analiza tu comportamiento de pago
-            en tiempo real. No dependemos solo del buró de credito tradicional.
+            en tiempo real. No dependemos solo del buro de credito tradicional.
           </p>
           <ul className="mt-3 flex flex-col gap-2.5">
             <li className="flex items-start gap-2.5 text-sm">
@@ -357,14 +355,30 @@ function PropositoStep({ onNext }: { onNext: () => void }) {
   )
 }
 
-const docs = [
-  { icon: FileText, label: 'Extracto bancario', hint: 'Ultimos 3 meses' },
-  { icon: Smartphone, label: 'Pantallazo Nequi / Daviplata', hint: 'Movimientos recientes' },
-  { icon: Wallet, label: 'Factura de servicios', hint: 'Para validar tu direccion' },
+const docItems = [
+  {
+    icon: Camera,
+    label: 'Cedula Frontal',
+    hint: 'Alinea tu cedula dentro del marco verde',
+    isCamera: true,
+  },
+  {
+    icon: Camera,
+    label: 'Cedula Reverso',
+    hint: 'Voltea tu cedula y alinea dentro del marco verde',
+    isCamera: true,
+  },
+  {
+    icon: FileText,
+    label: 'Soportes de Ingresos',
+    hint: 'Puedes subir extractos, fotos, comprobantes, facturas de tu negocio, cupones de pago o pantallazos de tus cuentas. Sube lo que tengas para demostrar tus ingresos.',
+    isCamera: false,
+  },
 ]
 
 function DocumentsStep({ onNext }: { onNext: () => void }) {
   const [done, setDone] = useState<number[]>([])
+  const [cameraOpen, setCameraOpen] = useState<number | null>(null)
 
   return (
     <div>
@@ -372,33 +386,81 @@ function DocumentsStep({ onNext }: { onNext: () => void }) {
         title="Sube tus documentos"
         desc="Adjunta imagenes o PDF. Esto nos ayuda a aprobarte mas cupo."
       />
+
+      {/* Camera simulation overlay */}
+      <AnimatePresence>
+        {cameraOpen !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6"
+          >
+            <p className="mb-6 text-center font-heading text-lg font-bold text-white">
+              {docItems[cameraOpen].label}
+            </p>
+            <div className="relative flex aspect-[3/2] w-full max-w-sm items-center justify-center rounded-2xl border-4 border-dashed border-green-400 bg-black">
+              <Camera className="size-16 text-green-400/40" />
+              <span className="absolute bottom-4 text-sm font-semibold text-green-400">
+                Alinea tu documento dentro del marco
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setDone((p) => (p.includes(cameraOpen) ? p : [...p, cameraOpen]))
+                setCameraOpen(null)
+              }}
+              className="mt-8 flex h-14 items-center justify-center gap-2 rounded-2xl bg-orange px-10 font-heading text-lg font-bold text-white"
+            >
+              <Camera className="size-5" />
+              Capturar
+            </button>
+            <button
+              type="button"
+              onClick={() => setCameraOpen(null)}
+              className="mt-3 text-sm font-bold text-white/60"
+            >
+              Cancelar
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col gap-3">
-        {docs.map((d, i) => {
+        {docItems.map((d, i) => {
           const Icon = d.icon
           const uploaded = done.includes(i)
           return (
             <button
               key={d.label}
               type="button"
-              onClick={() => setDone((p) => (p.includes(i) ? p : [...p, i]))}
-              className={`flex items-center gap-3 rounded-2xl border-2 border-dashed p-4 text-left transition-colors ${
+              onClick={() => {
+                if (uploaded) return
+                if (d.isCamera) {
+                  setCameraOpen(i)
+                } else {
+                  setDone((p) => [...p, i])
+                }
+              }}
+              className={`flex items-start gap-3 rounded-2xl border-2 border-dashed p-4 text-left transition-colors ${
                 uploaded ? 'border-orange bg-orange/5' : 'border-border bg-card'
               }`}
             >
               <span
-                className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${
-                  uploaded ? 'bg-orange text-orange-foreground' : 'bg-muted text-navy'
+                className={`mt-0.5 flex size-11 shrink-0 items-center justify-center rounded-xl ${
+                  uploaded ? 'bg-orange text-white' : 'bg-muted text-navy'
                 }`}
               >
                 {uploaded ? <Check className="size-5" /> : <Icon className="size-5" />}
               </span>
               <div className="flex-1">
                 <p className="font-heading font-bold text-navy">{d.label}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   {uploaded ? 'Archivo cargado' : d.hint}
                 </p>
               </div>
-              {!uploaded && <CloudUpload className="size-5 text-muted-foreground" />}
+              {!uploaded && <CloudUpload className="mt-1 size-5 shrink-0 text-muted-foreground" />}
             </button>
           )
         })}
@@ -417,9 +479,9 @@ function IdentityStep({ onNext }: { onNext: () => void }) {
     <div>
       <StepTitle
         title="Validemos que eres tu"
-        desc="Una foto rapida de tu rostro y tu documento. Solo unos segundos."
+        desc="Una foto rapida de tu rostro. Solo unos segundos."
       />
-      <div className="flex flex-col items-center rounded-3xl bg-navy p-8 text-navy-foreground">
+      <div className="flex flex-col items-center rounded-3xl bg-navy p-8 text-white">
         <motion.span
           animate={captured ? { scale: [1, 1.15, 1] } : {}}
           className={`flex size-28 items-center justify-center rounded-full ${

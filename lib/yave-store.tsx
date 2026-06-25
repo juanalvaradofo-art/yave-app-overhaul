@@ -19,6 +19,7 @@ export type LogEntry = {
 }
 
 type PaymentType = 'timely' | 'early' | 'mora'
+export type CreditStatus = 'none' | 'pending' | 'approved' | 'accepted' | 'signed'
 
 type YaveState = {
   userName: string
@@ -27,12 +28,12 @@ type YaveState = {
   coins: number
   rankIndex: number
   logs: LogEntry[]
-  /** Set when a payment pushes XP past the next threshold; drives the celebration overlay. */
   rankUpTo: number | null
-  /** Set when a late payment drops the user below their previous rank. */
   rankDownTo: number | null
+  creditStatus: CreditStatus
   setHasCupo: (v: boolean) => void
   requestCupo: () => void
+  setCreditStatus: (s: CreditStatus) => void
   registerPayment: (type: PaymentType, moraDays?: number) => void
   redeem: (cost: number, label: string) => void
   clearRankUp: () => void
@@ -61,21 +62,25 @@ function id() {
 
 export function YaveProvider({ children }: { children: ReactNode }) {
   const [hasCupo, setHasCupo] = useState(true)
-  const [xp, setXp] = useState(520) // Bronce, close to Plata (600)
+  const [xp, setXp] = useState(520)
   const [coins, setCoins] = useState(3450)
   const [rankUpTo, setRankUpTo] = useState<number | null>(null)
   const [rankDownTo, setRankDownTo] = useState<number | null>(null)
+  const [creditStatus, setCreditStatus] = useState<CreditStatus>('none')
   const [logs, setLogs] = useState<LogEntry[]>([
     { id: id(), kind: 'coins', label: 'Pago a tiempo · 12 jun', delta: 200, date: '12 jun' },
     { id: id(), kind: 'xp', label: 'Pago a tiempo · 12 jun', delta: 100, date: '12 jun' },
-    { id: id(), kind: 'coins', label: 'Canje · Datos móviles 5GB', delta: -800, date: '08 jun' },
+    { id: id(), kind: 'coins', label: 'Canje · Datos moviles 5GB', delta: -800, date: '08 jun' },
     { id: id(), kind: 'xp', label: 'Pago anticipado · 28 may', delta: 150, date: '28 may' },
     { id: id(), kind: 'coins', label: 'Pago anticipado · 28 may', delta: 300, date: '28 may' },
   ])
 
   const rankIndex = useMemo(() => rankIndexForXp(xp), [xp])
 
-  const requestCupo = useCallback(() => setHasCupo(true), [])
+  const requestCupo = useCallback(() => {
+    setHasCupo(true)
+    setCreditStatus('signed')
+  }, [])
 
   const registerPayment = useCallback(
     (type: PaymentType, moraDays = 1) => {
@@ -84,7 +89,7 @@ export function YaveProvider({ children }: { children: ReactNode }) {
         const coinDelta = xpRules.moraPerDay.coins * moraDays
         const xpDelta = xpRules.moraPerDay.xp * moraDays
         const newXp = Math.max(0, xp + xpDelta)
-        const dayLabel = `${moraDays} día${moraDays > 1 ? 's' : ''}`
+        const dayLabel = `${moraDays} dia${moraDays > 1 ? 's' : ''}`
         setXp(newXp)
         setCoins((c) => Math.max(0, c + coinDelta))
         setLogs((l) => [
@@ -132,14 +137,16 @@ export function YaveProvider({ children }: { children: ReactNode }) {
       logs,
       rankUpTo,
       rankDownTo,
+      creditStatus,
       setHasCupo,
       requestCupo,
+      setCreditStatus,
       registerPayment,
       redeem,
       clearRankUp,
       clearRankDown,
     }),
-    [hasCupo, xp, coins, rankIndex, logs, rankUpTo, rankDownTo, requestCupo, registerPayment, redeem, clearRankUp, clearRankDown],
+    [hasCupo, xp, coins, rankIndex, logs, rankUpTo, rankDownTo, creditStatus, requestCupo, registerPayment, redeem, clearRankUp, clearRankDown],
   )
 
   return <YaveContext.Provider value={value}>{children}</YaveContext.Provider>

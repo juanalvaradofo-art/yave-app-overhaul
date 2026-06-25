@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { CreditCard } from 'lucide-react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { useEffect } from 'react'
 import { PaymentSheet } from '@/components/payment-sheet'
 
 export function FloatingPayButton() {
@@ -22,13 +21,7 @@ export function FloatingPayButton() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [scrollY])
 
-  const handleClick = () => {
-    if (isApp) {
-      setPayOpen(true)
-    }
-  }
-
-  const content = (
+  const btn = (
     <motion.div
       drag
       dragMomentum={false}
@@ -41,25 +34,21 @@ export function FloatingPayButton() {
       {isApp ? (
         <button
           type="button"
-          onClick={handleClick}
+          onClick={() => setPayOpen(true)}
           aria-label="Paga aqui"
-          className="flex items-center gap-2.5 rounded-l-full bg-orange py-3.5 pl-6 pr-5 font-heading text-sm font-extrabold text-orange-foreground shadow-xl shadow-orange/30 ring-1 ring-orange/20 transition-transform hover:shadow-orange/40"
+          className="flex items-center gap-2 rounded-l-full border border-r-0 border-orange/30 bg-white py-2.5 pl-4 pr-3 font-heading text-xs font-bold text-orange shadow-md transition-all hover:bg-orange hover:text-white"
         >
-          <span className="flex size-8 items-center justify-center rounded-full bg-white/20">
-            <CreditCard className="size-4" strokeWidth={2.5} />
-          </span>
-          Paga aqui
+          <CreditCard className="size-4" strokeWidth={2.5} />
+          Pagar
         </button>
       ) : (
         <a
           href="/onboarding"
-          aria-label="Paga aqui"
-          className="flex items-center gap-2.5 rounded-l-full bg-orange py-3.5 pl-6 pr-5 font-heading text-sm font-extrabold text-orange-foreground shadow-xl shadow-orange/30 ring-1 ring-orange/20 transition-transform hover:shadow-orange/40"
+          aria-label="Solicitar"
+          className="flex items-center gap-2 rounded-l-full border border-r-0 border-orange/30 bg-white py-2.5 pl-4 pr-3 font-heading text-xs font-bold text-orange shadow-md transition-all hover:bg-orange hover:text-white"
         >
-          <span className="flex size-8 items-center justify-center rounded-full bg-white/20">
-            <CreditCard className="size-4" strokeWidth={2.5} />
-          </span>
-          Paga aqui
+          <CreditCard className="size-4" strokeWidth={2.5} />
+          Solicitar
         </a>
       )}
     </motion.div>
@@ -67,7 +56,7 @@ export function FloatingPayButton() {
 
   return (
     <>
-      {content}
+      {btn}
       {isApp && <PaymentSheet open={payOpen} onClose={() => setPayOpen(false)} />}
     </>
   )

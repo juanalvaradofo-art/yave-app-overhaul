@@ -41,7 +41,7 @@ export default function LandingPage() {
           <YaveLogo />
           <Link
             href="/inicio"
-            className="rounded-full bg-navy px-6 py-2.5 text-sm font-extrabold tracking-wide text-navy-foreground shadow-md shadow-navy/20 ring-1 ring-navy/10 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-navy/25 active:translate-y-0"
+            className="rounded-full border-2 border-navy bg-transparent px-6 py-2 text-sm font-extrabold tracking-wide text-navy transition-all hover:bg-navy hover:text-white active:translate-y-px"
           >
             Ingresar
           </Link>

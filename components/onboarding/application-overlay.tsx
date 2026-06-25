@@ -11,7 +11,7 @@ export function ApplicationOverlay({
   open: boolean
   onClose: () => void
 }) {
-  const { requestCupo } = useYave()
+  const { setCreditStatus } = useYave()
 
   return (
     <AnimatePresence>
@@ -27,7 +27,7 @@ export function ApplicationOverlay({
             mode="application"
             onExit={onClose}
             onComplete={() => {
-              requestCupo()
+              setCreditStatus('pending')
               onClose()
             }}
           />

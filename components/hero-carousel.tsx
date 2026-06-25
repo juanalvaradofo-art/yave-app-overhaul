@@ -13,6 +13,7 @@ const slides = [
     title: 'El credito que te entiende',
     text: 'Pocos requisitos, respuesta en minutos y recompensas en cada pago. Pide tu plata sin enredos.',
     cta: 'Solicitar mi plata',
+    accent: 'from-navy to-[#13365E]',
   },
   {
     badge: 'Siempre con un humano',
@@ -20,6 +21,7 @@ const slides = [
     title: 'Te atiende gente, no robots',
     text: 'Lineas de atencion de lunes a sabado. Hablas con un parcero de verdad cuando lo necesitas.',
     cta: 'Hablar con Yave',
+    accent: 'from-[#0D2D4F] to-navy',
   },
   {
     badge: 'Gana mientras pagas',
@@ -27,13 +29,15 @@ const slides = [
     title: 'Cada pago suma Yave Coins',
     text: 'Sube de llave, desbloquea La Boveda y canjea tus monedas por beneficios reales.',
     cta: 'Conocer recompensas',
+    accent: 'from-navy to-[#0F2F52]',
   },
   {
     badge: 'Seguridad bancaria',
     icon: ShieldCheck,
-    title: 'Tus datos protegidos',
+    title: 'Tus datos estan protegidos',
     text: 'Cifrado de nivel bancario y vigilancia de la Superintendencia Financiera de Colombia.',
     cta: 'Saber mas',
+    accent: 'from-[#0E2E50] to-navy',
   },
   {
     badge: 'Comunidad Yave',
@@ -41,6 +45,7 @@ const slides = [
     title: 'Mas de 250.000 parceros',
     text: 'Unidos por un credito justo, transparente y hecho en Colombia.',
     cta: 'Unirme ahora',
+    accent: 'from-navy to-[#122F4E]',
   },
 ]
 
@@ -56,7 +61,11 @@ export function HeroCarousel() {
   const Icon = slide.icon
 
   return (
-    <div className="relative overflow-hidden rounded-[2rem] bg-navy p-6 text-navy-foreground">
+    <div className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br ${slide.accent} p-6 text-white shadow-xl ring-1 ring-white/5`}>
+      {/* Decorative corner accents */}
+      <div className="absolute -right-8 -top-8 size-32 rounded-full bg-yellow/10" />
+      <div className="absolute -left-6 bottom-20 size-20 rounded-full bg-orange/8" />
+
       <div className="relative min-h-[238px]">
         <AnimatePresence mode="wait">
           <motion.div
@@ -66,7 +75,7 @@ export function HeroCarousel() {
             exit={{ opacity: 0, x: -24 }}
             transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow px-3 py-1.5 text-xs font-bold text-yellow-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow px-3 py-1.5 text-xs font-bold text-yellow-foreground shadow-sm">
               <Icon className="size-4" />
               {slide.badge}
             </span>
@@ -89,7 +98,7 @@ export function HeroCarousel() {
 
       <Link
         href="/onboarding"
-        className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-orange-foreground transition-transform active:translate-y-px"
+        className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-orange font-heading text-lg font-bold text-white shadow-lg shadow-orange/25 transition-all hover:brightness-110 active:translate-y-px"
       >
         {slide.cta}
         <ArrowRight className="size-5" />
